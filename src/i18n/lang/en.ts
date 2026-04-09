@@ -9,9 +9,6 @@ export const en: Locale = {
       logout: 'SignOut'
     },
     footer: {
-      website: 'Website',
-      document: 'Document',
-      authorization: 'Authorization',
       copyright: 'Copyright © 2025 xxx'
     },
     logout: {

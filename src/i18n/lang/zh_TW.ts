@@ -9,9 +9,6 @@ export const zh_TW: Locale = {
       logout: '安全登出'
     },
     footer: {
-      website: '官網',
-      document: '檔案',
-      authorization: '授權',
       copyright: 'Copyright © 2025 xxxx'
     },
     logout: {

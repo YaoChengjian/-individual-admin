@@ -7,9 +7,6 @@ export const zh_CN = {
       logout: '退出登录'
     },
     footer: {
-      website: '官网',
-      document: '文档',
-      authorization: '授权',
       copyright: 'Copyright © 2025 xxx'
     },
     logout: {
