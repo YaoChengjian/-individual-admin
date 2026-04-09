@@ -1,0 +1,41 @@
+/** 透明主题(css-var) */
+@use 'y-element-ultra/es/style/util.scss' as *;
+@use 'y-element-ultra/es/style/themes/transparent-css-var.scss' as *;
+
+html.is-transparent {
+  /* 登录界面背景修改 */
+  div.login-wrapper {
+    background: none;
+  }
+
+  /* 编辑器组件背景修改 */
+  body .tox.tox-tinymce.tox-fullscreen/* ,
+  .y-bytemd-wrap .bytemd.bytemd-fullscreen */ {
+    background: yVar('skin-bg', 'overlay');
+  }
+}
+
+/* 主题抽屉常用布局封面修改 */
+html.is-transparent .y-setting-layout-list:not(.y-setting-skin-list),
+html.y-theme-simple .y-setting-layout-list:not(.y-setting-skin-list),
+html.y-theme-simple-dark .y-setting-layout-list {
+  .y-setting-layout-item-cover .y-setting-layout-cover-bg-dark {
+    background: elVar('bg-color');
+
+    & + div {
+      border-left: 1px solid elVar('border-color', 'lighter');
+    }
+
+    &
+      + .y-setting-layout-cover-bg-light:not(
+        .y-setting-layout-cover-border-lighter
+      ) {
+      border-top: 1px solid elVar('border-color', 'lighter');
+    }
+  }
+
+  .y-setting-layout-item-cover .y-setting-layout-cover-bg-primary {
+    background: elVar('bg-color');
+    border-bottom: 1px solid elVar('border-color', 'lighter');
+  }
+}

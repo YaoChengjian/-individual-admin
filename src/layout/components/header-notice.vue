@@ -1,0 +1,325 @@
+<!-- 顶栏消息通知 -->
+<template>
+  <y-popover
+    :width="336"
+    trigger="click"
+    transition="el-zoom-in-top"
+    :content-style="{ padding: 0 }"
+    :body-style="{ overflow: 'hidden' }"
+    :popper-style="{ maxWidth: 'calc(100% - 32px)' }"
+    :popper-options="{
+      strategy: 'fixed',
+      modifiers: [{ name: 'offset', options: { offset: [0, 5] } }]
+    }"
+  >
+    <template #reference>
+      <div style="display: flex; align-items: center; height: 100%">
+        <el-badge
+          :value="unreadNum"
+          :hidden="!unreadNum"
+          style="line-height: 1; padding: 4px 0"
+        >
+          <el-icon style="transform: scale(1.17)">
+            <BellOutlined />
+          </el-icon>
+        </el-badge>
+      </div>
+    </template>
+    <y-tabs
+      ref="tabRef"
+      :center="true"
+      v-model="active"
+      :items="[
+        { name: 'notice', label: '通知' },
+        { name: 'letter', label: '私信' },
+        { name: 'todo', label: '待办' }
+      ]"
+      class="notice-tabs"
+    >
+      <template #label="{ item, label }">
+        <span>{{ label }}</span>
+        <span v-if="item.name === 'notice' && notices.length">
+          ({{ notices.length }})
+        </span>
+        <span v-if="item.name === 'letter' && letters.length">
+          ({{ letters.length }})
+        </span>
+        <span v-if="item.name === 'todo' && todos.length">
+          ({{ todos.length }})
+        </span>
+      </template>
+      <template #notice>
+        <div class="list-wrapper">
+          <div v-for="item in notices" :key="item.id" class="list-item">
+            <div class="list-item-icon" :style="{ background: item.color }">
+              <el-icon>
+                <Comment
+                  v-if="item.icon === 'report'"
+                  style="transform: translateY(1px)"
+                />
+                <Stamp v-else-if="item.icon === 'leave'" />
+                <Promotion v-else-if="item.icon === 'meeting'" />
+                <Checked v-else-if="item.icon === 'interview'" />
+                <BellFilled v-else-if="item.icon === 'salary'" />
+              </el-icon>
+            </div>
+            <div class="list-item-body">
+              <y-ellipsis>{{ item.title }}</y-ellipsis>
+              <y-ellipsis type="placeholder" class="list-item-text">
+                {{ item.time }}
+              </y-ellipsis>
+            </div>
+          </div>
+        </div>
+        <div v-if="notices.length" class="bottom-tools">
+          <div class="bottom-tool" @click="clearNotice">全部确认</div>
+          <el-divider direction="vertical" style="margin: 0; width: 0" />
+          <router-link to="/user/message?type=notice" class="bottom-tool">
+            查看更多
+          </router-link>
+        </div>
+        <el-empty v-else description="已查看所有通知" :image-size="68" />
+      </template>
+      <template #letter>
+        <div class="list-wrapper">
+          <div v-for="item in letters" :key="item.id" class="list-item">
+            <el-avatar :size="32" :src="item.avatar" />
+            <div class="list-item-body">
+              <y-ellipsis>{{ item.title }}</y-ellipsis>
+              <y-ellipsis type="placeholder" class="list-item-text">
+                {{ item.content }}
+              </y-ellipsis>
+              <y-ellipsis type="placeholder" class="list-item-text">
+                {{ item.time }}
+              </y-ellipsis>
+            </div>
+          </div>
+        </div>
+        <div v-if="letters.length" class="bottom-tools">
+          <div class="bottom-tool" @click="clearLetter">全部已读</div>
+          <el-divider direction="vertical" style="margin: 0; width: 0" />
+          <router-link to="/user/message?type=letter" class="bottom-tool">
+            查看更多
+          </router-link>
+        </div>
+        <el-empty v-else description="已读完所有私信" :image-size="68" />
+      </template>
+      <template #todo>
+        <div class="list-wrapper">
+          <div v-for="item in todos" :key="item.id" class="list-item">
+            <div class="list-item-body">
+              <y-ellipsis>{{ item.title }}</y-ellipsis>
+              <y-ellipsis type="placeholder" class="list-item-text">
+                {{ item.description }}
+              </y-ellipsis>
+            </div>
+            <el-tag
+              v-if="item.status === 0"
+              type="info"
+              size="small"
+              :disable-transitions="true"
+            >
+              待处理
+            </el-tag>
+            <el-tag
+              v-else-if="item.status === 1"
+              type="success"
+              size="small"
+              :disable-transitions="true"
+            >
+              已完成
+            </el-tag>
+          </div>
+        </div>
+        <div v-if="todos.length" class="bottom-tools">
+          <div class="bottom-tool" @click="clearTodo">全部完成</div>
+          <el-divider direction="vertical" style="margin: 0; width: 0" />
+          <router-link to="/user/message?type=todo" class="bottom-tool">
+            查看更多
+          </router-link>
+        </div>
+        <el-empty v-else description="已完成所有任务" :image-size="68" />
+      </template>
+    </y-tabs>
+  </y-popover>
+</template>
+
+<script lang="ts" setup>
+  import { ref, nextTick, onMounted } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useMessage } from 'y-element-ultra';
+  import type { YTabs } from 'y-element-ultra';
+  import {
+    Comment,
+    Stamp,
+    Promotion,
+    Checked,
+    BellFilled
+  } from '@element-plus/icons-vue';
+  import { BellOutlined } from '@/components/icons';
+  import { useNoticeStore } from '@/store/modules/notice';
+  import { updateUserMessageStatus } from '@/api/user/message';
+
+  const noticeStore = useNoticeStore();
+  const { notices, letters, todos, unreadNum } = storeToRefs(noticeStore);
+  const messageIns = useMessage({ inner: true, plain: true });
+
+  /** 选项卡 */
+  const tabRef = ref<InstanceType<typeof YTabs> | null>(null);
+
+  /** 选项卡选中 */
+  const active = ref<string>('notice');
+
+  /** 更新选项卡指示线 */
+  const updateActiveBar = () => {
+    nextTick(() => {
+      tabRef.value?.updateActiveBar?.();
+    });
+  };
+
+  /** 刷新消息 */
+  const loadUnreadMessages = () => {
+    noticeStore
+      .loadUnreadMessages()
+      .then(() => {
+        updateActiveBar();
+      })
+      .catch((e) => {
+        messageIns.error(e.message);
+      });
+  };
+
+  /** 批量处理消息 */
+  const handleBatchStatus = (
+    messageType: 'notice' | 'letter' | 'todo',
+    ids: number[]
+  ) => {
+    if (!ids.length) {
+      return;
+    }
+    $http(
+      updateUserMessageStatus(messageType, ids),
+      (res) => {
+        messageIns.success(res.message || '操作成功');
+        loadUnreadMessages();
+      },
+      (e) => {
+        messageIns.error(e.message);
+      },
+      true
+    );
+  };
+
+  /** 清空通知 */
+  const clearNotice = () => {
+    handleBatchStatus(
+      'notice',
+      notices.value.map((item) => item.id)
+    );
+  };
+
+  /** 清空私信 */
+  const clearLetter = () => {
+    handleBatchStatus(
+      'letter',
+      letters.value.map((item) => item.id)
+    );
+  };
+
+  /** 清空待办 */
+  const clearTodo = () => {
+    handleBatchStatus(
+      'todo',
+      todos.value.map((item) => item.id)
+    );
+  };
+
+  onMounted(() => {
+    loadUnreadMessages();
+  });
+</script>
+
+<style lang="scss" scoped>
+  .list-wrapper {
+    padding-top: 8px;
+    box-sizing: border-box;
+    max-height: calc(100vh - 180px);
+    min-height: 60px;
+    overflow: auto;
+  }
+
+  .list-item {
+    display: flex;
+    padding: 14px 24px;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+    .list-item-body {
+      flex: 1;
+      overflow: hidden;
+
+      .list-item-text {
+        margin-top: 6px;
+      }
+    }
+
+    .list-item-icon {
+      width: 32px;
+      height: 32px;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 50%;
+      text-align: center;
+      background-color: #60b2fc;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    :deep(.el-avatar) {
+      flex-shrink: 0;
+    }
+
+    .list-item-icon + .list-item-body,
+    :deep(.el-avatar + .list-item-body) {
+      padding-left: 12px;
+    }
+
+    &:hover {
+      background-color: hsla(0, 0%, 60%, 0.08);
+    }
+
+    & + .list-item {
+      border-top: 1px solid hsla(0, 0%, 60%, 0.2);
+    }
+  }
+
+  /* 操作按钮 */
+  .bottom-tools {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid hsla(0, 0%, 60%, 0.2);
+
+    .bottom-tool {
+      flex: 1;
+      line-height: 46px;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      cursor: pointer;
+      color: inherit;
+
+      &:hover {
+        background: hsla(0, 0%, 60%, 0.08);
+      }
+    }
+  }
+
+  /* 修改标签页样式 */
+  .notice-tabs :deep(.el-tabs__header) {
+    --y-tab-height: 44px;
+    --y-tab-padding: 22px;
+  }
+</style>
