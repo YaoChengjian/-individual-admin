@@ -11,10 +11,20 @@
       :export-config="{ fileName: '待办事项数据' }"
     >
       <template #toolbar>
-        <el-button type="primary" class="y-btn-icon" @click="ok()">
+        <el-button
+          v-permission="'user:message:status'"
+          type="primary"
+          class="y-btn-icon"
+          @click="ok()"
+        >
           批量完成
         </el-button>
-        <el-button type="danger" class="y-btn-icon" @click="remove()">
+        <el-button
+          v-permission="'user:message:remove'"
+          type="danger"
+          class="y-btn-icon"
+          @click="remove()"
+        >
           删除待办
         </el-button>
       </template>
@@ -23,11 +33,21 @@
         <y-text v-else-if="row.status === 1" type="info">已完成</y-text>
       </template>
       <template #action="{ row }">
-        <el-link type="primary" underline="never" @click="ok(row)">
+        <el-link
+          v-permission="'user:message:status'"
+          type="primary"
+          underline="never"
+          @click="ok(row)"
+        >
           完成
         </el-link>
         <el-divider direction="vertical" />
-        <el-link type="danger" underline="never" @click="remove(row)">
+        <el-link
+          v-permission="'user:message:remove'"
+          type="danger"
+          underline="never"
+          @click="remove(row)"
+        >
           删除
         </el-link>
       </template>

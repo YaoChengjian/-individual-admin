@@ -18,7 +18,11 @@
         <template #toolbar>
           <btn-items
             :items="[
-              { preset: 'add', onClick: () => openEdit() },
+              {
+                preset: 'add',
+                permission: 'system:organization:add',
+                onClick: () => openEdit()
+              },
               { preset: 'expand', onClick: () => expandAll() },
               { preset: 'fold', onClick: () => foldAll() }
             ]"
@@ -31,10 +35,19 @@
             :items="[
               {
                 preset: 'add',
+                permission: 'system:organization:add',
                 onClick: () => openEdit(null, row.organizationId)
               },
-              { preset: 'edit', onClick: () => openEdit(row) },
-              { preset: 'del', onClick: () => remove(row) }
+              {
+                preset: 'edit',
+                permission: 'system:organization:edit',
+                onClick: () => openEdit(row)
+              },
+              {
+                preset: 'del',
+                permission: 'system:organization:remove',
+                onClick: () => remove(row)
+              }
             ]"
           />
         </template>

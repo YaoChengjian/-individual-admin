@@ -67,7 +67,12 @@
       </div>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" :loading="loading" @click="save">
+      <el-button
+        v-permission="'user:profile:update'"
+        type="primary"
+        :loading="loading"
+        @click="save"
+      >
         {{ loading ? '保存中..' : '保存更改' }}
       </el-button>
     </el-form-item>

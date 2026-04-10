@@ -53,7 +53,7 @@
                   :prefix-icon="ProtectOutlined"
                 />
                 <div class="login-captcha" @click="changeCaptcha">
-                  <img v-if="captcha" :src="captcha" />
+                  <img v-if="captcha" :key="captchaVersion" :src="captcha" />
                 </div>
               </div>
             </el-form-item>
@@ -173,6 +173,9 @@
   /** 图形验证码 */
   const captcha = ref('');
 
+  /** 验证码版本号，强制图片节点重建，避免 data url 在视图层看起来没有变化 */
+  const captchaVersion = ref(0);
+
   /** 验证码内容, 实际项目去掉 */
   const text = ref('');
 
@@ -216,6 +219,7 @@
       (res) => {
         const data = res.data;
         captcha.value = data?.base64 || '';
+        captchaVersion.value += 1;
         // 实际项目后端一般会返回验证码的key而不是直接返回验证码的内容, 登录用key去验证, 可以根据自己后端接口修改
         text.value = data?.text || '';
         // 自动回填验证码, 实际项目去掉

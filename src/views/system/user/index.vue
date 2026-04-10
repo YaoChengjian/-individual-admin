@@ -75,9 +75,21 @@
             <template #toolbar>
               <btn-items
                 :items="[
-                  { preset: 'add', onClick: () => openEdit() },
-                  { preset: 'del', onClick: () => remove() },
-                  { preset: 'import', onClick: () => openImport() }
+                  {
+                    preset: 'add',
+                    permission: 'system:user:add',
+                    onClick: () => openEdit()
+                  },
+                  {
+                    preset: 'del',
+                    permission: 'system:user:remove',
+                    onClick: () => remove()
+                  },
+                  {
+                    preset: 'import',
+                    permission: 'system:user:import',
+                    onClick: () => openImport()
+                  }
                 ]"
               />
             </template>
@@ -102,6 +114,7 @@
             </template>
             <template #status="{ row }">
               <el-switch
+                v-permission="'system:user:status'"
                 size="small"
                 :model-value="row.status === 0"
                 @change="(checked: boolean) => editStatus(checked, row)"
@@ -112,13 +125,18 @@
                 divider
                 type="link"
                 :items="[
-                  { preset: 'edit', onClick: () => openEdit(row) },
+                  {
+                    preset: 'edit',
+                    permission: 'system:user:edit',
+                    onClick: () => openEdit(row)
+                  },
                   {
                     preset: 'more',
                     dropdownItems: [
                       {
                         title: '重置密码',
                         icon: LockOutlined,
+                        permission: 'system:user:reset-password',
                         onClick: () => handleUpdatePassword(row)
                       },
                       {
@@ -126,6 +144,7 @@
                         icon: DeleteOutlined,
                         danger: true,
                         divided: true,
+                        permission: 'system:user:remove',
                         onClick: () => remove(row)
                       }
                     ]

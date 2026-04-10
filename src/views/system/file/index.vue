@@ -27,7 +27,15 @@
           >
             <btn-items :items="[{ preset: 'upload' }]" />
           </el-upload>
-          <btn-items :items="[{ preset: 'del', onClick: () => remove() }]" />
+          <btn-items
+            :items="[
+              {
+                preset: 'del',
+                permission: 'system:file:remove',
+                onClick: () => remove()
+              }
+            ]"
+          />
         </template>
         <template #path="{ row }">
           <el-link
@@ -48,7 +56,11 @@
                 preset: 'download',
                 props: { href: row.downloadUrl, target: '_blank' }
               },
-              { preset: 'del', onClick: () => remove(row) }
+              {
+                preset: 'del',
+                permission: 'system:file:remove',
+                onClick: () => remove(row)
+              }
             ]"
           />
         </template>

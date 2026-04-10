@@ -22,14 +22,20 @@
         <btn-items
           :wrap="false"
           :items="[
-            { preset: 'add', onClick: () => openTreeEdit() },
+            {
+              preset: 'add',
+              permission: 'system:dictionary:add',
+              onClick: () => openTreeEdit()
+            },
             {
               preset: 'edit',
+              permission: 'system:dictionary:edit',
               props: { disabled: !current },
               onClick: () => openTreeEdit(current)
             },
             {
               preset: 'del',
+              permission: 'system:dictionary:remove',
               props: { disabled: !current },
               onClick: () => removeTree()
             }
@@ -104,8 +110,16 @@
             <template #toolbar>
               <btn-items
                 :items="[
-                  { preset: 'add', onClick: () => openEdit() },
-                  { preset: 'del', onClick: () => remove() }
+                  {
+                    preset: 'add',
+                    permission: 'system:dictionary-data:add',
+                    onClick: () => openEdit()
+                  },
+                  {
+                    preset: 'del',
+                    permission: 'system:dictionary-data:remove',
+                    onClick: () => remove()
+                  }
                 ]"
               />
             </template>
@@ -114,8 +128,16 @@
                 divider
                 type="link"
                 :items="[
-                  { preset: 'edit', onClick: () => openEdit(row) },
-                  { preset: 'del', onClick: () => remove(row) }
+                  {
+                    preset: 'edit',
+                    permission: 'system:dictionary-data:edit',
+                    onClick: () => openEdit(row)
+                  },
+                  {
+                    preset: 'del',
+                    permission: 'system:dictionary-data:remove',
+                    onClick: () => remove(row)
+                  }
                 ]"
               />
             </template>

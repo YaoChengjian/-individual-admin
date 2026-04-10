@@ -18,7 +18,11 @@
         <template #toolbar>
           <btn-items
             :items="[
-              { preset: 'add', onClick: () => openEdit() },
+              {
+                preset: 'add',
+                permission: 'system:menu:add',
+                onClick: () => openEdit()
+              },
               { preset: 'expand', onClick: () => handleExpandAll() },
               { preset: 'fold', onClick: () => handleFoldAll() }
             ]"
@@ -80,9 +84,21 @@
             divider
             type="link"
             :items="[
-              { preset: 'add', onClick: () => openEdit(null, row.menuId) },
-              { preset: 'edit', onClick: () => openEdit(row) },
-              { preset: 'del', onClick: () => remove(row) }
+              {
+                preset: 'add',
+                permission: 'system:menu:add',
+                onClick: () => openEdit(null, row.menuId)
+              },
+              {
+                preset: 'edit',
+                permission: 'system:menu:edit',
+                onClick: () => openEdit(row)
+              },
+              {
+                preset: 'del',
+                permission: 'system:menu:remove',
+                onClick: () => remove(row)
+              }
             ]"
           />
         </template>

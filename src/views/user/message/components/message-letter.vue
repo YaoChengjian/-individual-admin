@@ -11,10 +11,20 @@
       :export-config="{ fileName: '用户私信数据' }"
     >
       <template #toolbar>
-        <el-button type="primary" class="y-btn-icon" @click="readBatch">
+        <el-button
+          v-permission="'user:message:status'"
+          type="primary"
+          class="y-btn-icon"
+          @click="readBatch"
+        >
           标记已读
         </el-button>
-        <el-button type="danger" class="y-btn-icon" @click="remove()">
+        <el-button
+          v-permission="'user:message:remove'"
+          type="danger"
+          class="y-btn-icon"
+          @click="remove()"
+        >
           删除消息
         </el-button>
       </template>
@@ -27,7 +37,12 @@
           回复
         </el-link>
         <el-divider direction="vertical" />
-        <el-link type="danger" underline="never" @click="remove(row)">
+        <el-link
+          v-permission="'user:message:remove'"
+          type="danger"
+          underline="never"
+          @click="remove(row)"
+        >
           删除
         </el-link>
       </template>

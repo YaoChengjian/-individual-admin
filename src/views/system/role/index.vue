@@ -17,8 +17,16 @@
         <template #toolbar>
           <btn-items
             :items="[
-              { preset: 'add', onClick: () => openEdit() },
-              { preset: 'del', onClick: () => remove() }
+              {
+                preset: 'add',
+                permission: 'system:role:add',
+                onClick: () => openEdit()
+              },
+              {
+                preset: 'del',
+                permission: 'system:role:remove',
+                onClick: () => remove()
+              }
             ]"
           />
         </template>
@@ -27,13 +35,22 @@
             :divider="true"
             type="link"
             :items="[
-              { preset: 'edit', onClick: () => openEdit(row) },
+              {
+                preset: 'edit',
+                permission: 'system:role:edit',
+                onClick: () => openEdit(row)
+              },
               {
                 title: '分配权限',
                 icon: AppstoreAddOutlined,
+                permission: 'system:role:auth',
                 onClick: () => openAuth(row)
               },
-              { preset: 'del', onClick: () => remove(row) }
+              {
+                preset: 'del',
+                permission: 'system:role:remove',
+                onClick: () => remove(row)
+              }
             ]"
           />
         </template>
