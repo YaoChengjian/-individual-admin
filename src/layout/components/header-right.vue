@@ -14,6 +14,10 @@
   <layout-tool :class="{ 'hidden-sm-and-down': tabBar && tabInHeader }">
     <header-notice />
   </layout-tool>
+  <!-- 租户切换 -->
+  <layout-tool v-if="showTenantSwitch" class="hidden-sm-and-down">
+    <header-tenant />
+  </layout-tool>
   <!-- 用户信息 -->
   <layout-tool>
     <header-user />
@@ -43,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { storeToRefs } from 'pinia';
   import {
@@ -62,8 +66,10 @@
   } from '@/components/icons';
   import { doWithTransition } from '@/utils/common';
   import { useThemeStore } from '@/store/modules/theme';
+  import { useUserStore } from '@/store/modules/user';
   import HeaderUser from './header-user.vue';
   import HeaderNotice from './header-notice.vue';
+  import HeaderTenant from './header-tenant.vue';
   import I18nIcon from './i18n-icon.vue';
   import IconOutline from './covers/icon-outline.vue';
 
@@ -77,7 +83,13 @@
   const { openModal } = useModal();
 
   const themeStore = useThemeStore();
+  const userStore = useUserStore();
   const { tabBar, tabInHeader, darkMode, weakMode } = storeToRefs(themeStore);
+
+  /** 是否展示租户切换 */
+  const showTenantSwitch = computed(
+    () => (userStore.info?.tenantList?.length ?? 0) > 1
+  );
 
   const { t } = useI18n();
 

@@ -14,6 +14,10 @@ yarn-error.log*
 pnpm-debug.log*
 .pnpm-debug.log
 .eslintcache
+src/**/*.js
+src/**/*.js.map
+vite.config.js
+vite.config.js.map
 
 # Editor directories and files
 .idea

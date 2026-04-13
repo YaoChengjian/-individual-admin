@@ -6,6 +6,8 @@ import { PageParam } from '@/api';
 export interface Organization {
   /** 机构id */
   organizationId?: number;
+  /** 租户id */
+  tenantId?: number;
   /** 上级id, 0是顶级 */
   parentId?: number;
   /** 机构名称 */

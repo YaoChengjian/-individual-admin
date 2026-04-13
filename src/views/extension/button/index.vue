@@ -16,17 +16,17 @@
         </el-form-item>
 
         <el-form-item label="防抖时间(ms)">
-          <y-input v-model="time" inputType="integer" />
+          <el-input-number
+            v-model="time"
+            :min="0"
+            :max="10000"
+            controls-position="right"
+            class="y-fluid"
+          />
         </el-form-item>
 
         <el-form-item>
-          <y-button
-            :isDebounce="isDebounce"
-            :time="time"
-            type="primary"
-            @click="exportExcel"
-            >导出</y-button
-          >
+          <el-button type="primary" @click="exportExcel">导出</el-button>
         </el-form-item>
       </el-form>
     </y-card>

@@ -133,7 +133,7 @@
 
   /** 表单数据 */
   const form = reactive({
-    tenantId: 4, // 租户id, 不需要可去掉
+    tenantId: void 0 as number | undefined,
     username: 'admin',
     password: 'admin',
     code: '',

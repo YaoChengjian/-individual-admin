@@ -559,7 +559,8 @@
       inputErrorMessage: '密码必须为5-18位非空白字符',
       draggable: true
     })
-      .then(({ value }) => {
+      .then((payload: any) => {
+        const value = typeof payload === 'string' ? payload : payload?.value;
         const loading = YMessage.loading({
           message: '请求中..',
           plain: true

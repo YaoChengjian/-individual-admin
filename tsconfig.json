@@ -4,6 +4,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "strict": true,
+    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "strictFunctionTypes": false,

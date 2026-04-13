@@ -1,9 +1,8 @@
-<!-- 用户编辑弹窗 -->
 <template>
   <y-modal
     form
-    :width="680"
-    :title="isUpdate ? '修改用户' : '添加用户'"
+    :width="720"
+    :title="isUpdate ? '修改成员' : '添加成员'"
     :loading="loading"
     v-bind="modalProps"
   >
@@ -11,7 +10,7 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      label-width="80px"
+      label-width="88px"
       @submit.prevent=""
     >
       <el-row :gutter="16">
@@ -19,12 +18,12 @@
           <el-form-item label="所属机构">
             <organization-select v-model="form.organizationId" />
           </el-form-item>
-          <el-form-item label="用户账号" prop="username">
+          <el-form-item label="成员账号" prop="username">
             <el-input
               clearable
               :maxlength="20"
               v-model="form.username"
-              placeholder="请输入用户账号"
+              placeholder="请输入成员账号"
               :disabled="isUpdate"
             />
           </el-form-item>
@@ -35,12 +34,12 @@
                 : '已有账号可直接加入当前租户，无需重复创建账号。'
             }}
           </div>
-          <el-form-item label="用户名" prop="nickname">
+          <el-form-item label="成员名称" prop="nickname">
             <el-input
               clearable
               :maxlength="20"
               v-model="form.nickname"
-              placeholder="请输入用户名"
+              placeholder="请输入成员名称"
             />
           </el-form-item>
           <el-form-item label="性别" prop="sex">
@@ -50,22 +49,12 @@
             <role-select v-model="form.roles" />
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input
-              clearable
-              :maxlength="100"
-              v-model="form.email"
-              placeholder="请输入邮箱"
-            />
+            <el-input clearable :maxlength="100" v-model="form.email" placeholder="请输入邮箱" />
           </el-form-item>
         </el-col>
         <el-col :sm="12" :xs="24">
           <el-form-item label="手机号" prop="phone">
-            <el-input
-              clearable
-              :maxlength="11"
-              v-model="form.phone"
-              placeholder="请输入手机号"
-            />
+            <el-input clearable :maxlength="11" v-model="form.phone" placeholder="请输入手机号" />
           </el-form-item>
           <el-form-item label="出生日期">
             <el-date-picker
@@ -89,6 +78,22 @@
               <el-radio :value="0" label="正常" />
               <el-radio :value="1" label="冻结" />
             </el-radio-group>
+          </el-form-item>
+          <el-form-item label="成员权限">
+            <el-switch
+              v-model="adminChecked"
+              inline-prompt
+              active-text="管理员"
+              inactive-text="普通"
+            />
+          </el-form-item>
+          <el-form-item label="数据权限" prop="dataScope">
+            <el-select v-model="form.dataScope" placeholder="请选择数据权限" class="y-fluid">
+              <el-option label="仅本人" value="self" />
+              <el-option label="本机构" value="organization" />
+              <el-option label="当前租户" value="tenant" />
+              <el-option label="全部数据" value="all" />
+            </el-select>
           </el-form-item>
           <el-form-item label="个人简介">
             <el-input
@@ -114,19 +119,18 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { computed, ref, reactive } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
   import { YMessage, emailReg, phoneReg, useModal } from 'y-element-ultra';
   import { useFormData } from '@/utils/use-form-data';
-  import RoleSelect from './role-select.vue';
+  import RoleSelect from '@/views/system/user/components/role-select.vue';
   import OrganizationSelect from '@/views/system/organization/components/organization-select.vue';
-  import { addUser, updateUser, checkExistence } from '@/api/system/user';
-  import type { User } from '@/api/system/user/model';
+  import { addMember, updateMember } from '@/api/system/member';
+  import type { Member } from '@/api/system/member/model';
+  import { checkExistence } from '@/api/system/user';
 
   const props = defineProps<{
-    /** 修改回显的数据 */
-    data?: User | null;
-    /** 添加时机构id */
+    data?: Member | null;
     organizationId?: number;
   }>();
 
@@ -135,21 +139,12 @@
   }>();
 
   const { modalProps, closeModal } = useModal();
-
-  /** 是否是修改 */
   const isUpdate = ref(false);
-
-  /** 提交状态 */
   const loading = ref(false);
-
-  /** 是否复用已有平台账号 */
   const reuseExistingAccount = ref(false);
-
-  /** 表单组件 */
   const formRef = ref<FormInstance | null>(null);
 
-  /** 表单数据 */
-  const [form, _resetFields, assignFields] = useFormData<User>({
+  const [form, _resetFields, assignFields] = useFormData<Member>({
     userId: void 0,
     username: '',
     nickname: '',
@@ -161,24 +156,22 @@
     introduction: '',
     birthday: '',
     organizationId: props.organizationId,
-    status: 0
+    status: 0,
+    isAdmin: 0,
+    dataScope: 'tenant'
   });
 
-  /** 表单验证规则 */
+  const adminChecked = computed({
+    get: () => form.isAdmin === 1,
+    set: (value: boolean) => {
+      form.isAdmin = value ? 1 : 0;
+    }
+  });
+
   const rules = reactive<FormRules>({
     username: [
-      {
-        required: true,
-        message: '请输入用户账号',
-        type: 'string',
-        trigger: 'blur'
-      },
-      {
-        min: 4,
-        message: '账号长度最少为4位',
-        type: 'string',
-        trigger: 'blur'
-      },
+      { required: true, message: '请输入成员账号', type: 'string', trigger: 'blur' },
+      { min: 4, message: '账号长度最少为4位', type: 'string', trigger: 'blur' },
       {
         type: 'string',
         trigger: 'blur',
@@ -208,37 +201,11 @@
       }
     ],
     nickname: [
-      {
-        required: true,
-        message: '请输入用户名',
-        type: 'string',
-        trigger: 'blur'
-      }
+      { required: true, message: '请输入成员名称', type: 'string', trigger: 'blur' }
     ],
-    sex: [
-      {
-        required: true,
-        message: '请选择性别',
-        type: 'string',
-        trigger: 'change'
-      }
-    ],
-    roles: [
-      {
-        required: true,
-        message: '请选择角色',
-        type: 'array',
-        trigger: 'change'
-      }
-    ],
-    email: [
-      {
-        pattern: emailReg,
-        message: '邮箱格式不正确',
-        type: 'string',
-        trigger: 'blur'
-      }
-    ],
+    sex: [{ required: true, message: '请选择性别', type: 'string', trigger: 'change' }],
+    roles: [{ required: true, message: '请选择角色', type: 'array', trigger: 'change' }],
+    email: [{ pattern: emailReg, message: '邮箱格式不正确', type: 'string', trigger: 'blur' }],
     password: [
       {
         type: 'string',
@@ -265,34 +232,23 @@
       }
     ],
     phone: [
-      {
-        required: true,
-        message: '请输入手机号',
-        type: 'string',
-        trigger: 'blur'
-      },
-      {
-        pattern: phoneReg,
-        message: '手机号格式不正确',
-        type: 'string',
-        trigger: 'blur'
-      }
+      { required: true, message: '请输入手机号', type: 'string', trigger: 'blur' },
+      { pattern: phoneReg, message: '手机号格式不正确', type: 'string', trigger: 'blur' }
+    ],
+    dataScope: [
+      { required: true, message: '请选择数据权限', type: 'string', trigger: 'change' }
     ]
   });
 
-  /** 关闭弹窗 */
-  const handleCancel = () => {
-    closeModal();
-  };
+  const handleCancel = () => closeModal();
 
-  /** 保存编辑 */
   const save = () => {
     formRef.value?.validate?.((valid) => {
       if (!valid) {
         return;
       }
       loading.value = true;
-      const saveOrUpdate = isUpdate.value ? updateUser : addUser;
+      const saveOrUpdate = isUpdate.value ? updateMember : addMember;
       saveOrUpdate(form)
         .then((msg) => {
           loading.value = false;
@@ -307,16 +263,15 @@
     });
   };
 
-  /** 修改赋值 */
   if (props.data) {
-    assignFields({ ...props.data, password: '' });
+    assignFields(props.data);
     isUpdate.value = true;
   }
 </script>
 
 <style lang="scss" scoped>
   .form-help {
-    margin: -4px 0 12px 80px;
+    margin: -4px 0 12px 88px;
     color: var(--el-text-color-secondary);
     font-size: 12px;
     line-height: 1.5;
