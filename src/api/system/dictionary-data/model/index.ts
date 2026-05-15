@@ -12,6 +12,10 @@ export interface DictionaryData {
   dictDataCode: string;
   /** 字典数据名称 */
   dictDataName: string;
+  /** 显示颜色 */
+  color?: string;
+  /** 是否开启波纹 */
+  ripple?: number;
   /** 排序号 */
   sortNumber?: number;
   /** 备注 */

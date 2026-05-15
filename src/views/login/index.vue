@@ -245,24 +245,13 @@
 
 <style lang="scss" scoped>
   .login-wrapper {
-    min-height: 100vh;
+    @apply box-border flex min-h-screen flex-col bg-cover bg-center bg-no-repeat;
     min-height: 100dvh;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
     background-image: url('@/assets/login/login-bg.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
 
     .login-main {
-      flex: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      padding: 20px;
+      @apply box-border flex flex-auto flex-col items-end justify-center px-5 py-6;
+      padding-right: clamp(32px, 10vw, 168px);
     }
 
     .login-card {
@@ -354,8 +343,7 @@
       background: #fff;
 
       .login-main {
-        padding: 0;
-        display: block;
+        @apply block p-0;
       }
 
       .login-card {

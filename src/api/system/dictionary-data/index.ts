@@ -31,6 +31,18 @@ export async function listDictionaryData(params?: DictionaryDataParam) {
 }
 
 /**
+ * 快速获取字典并按值回显名称、颜色等信息
+ */
+export async function getDictionaryRecord(code: string, value?: string | number) {
+  const list = await listDictionaryData({ dictCode: code });
+  if (value == null || value === '') {
+    return { list, current: void 0 };
+  }
+  const current = list.find((item) => item.dictDataCode == value);
+  return { list, current };
+}
+
+/**
  * 添加字典数据
  */
 export async function addDictionaryData(data: DictionaryData) {

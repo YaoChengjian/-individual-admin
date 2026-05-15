@@ -71,6 +71,7 @@
 <script lang="ts" setup>
   import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
   import { BaseMap } from '@/TMap';
+  import { getTencentMapOptions } from '@/utils/tencent-map-options';
 
   type PatrolCoord = {
     lat: number;
@@ -120,11 +121,7 @@
     rotation: false
   };
 
-  const mapOptions = {
-    pitch: 0,
-    rotation: 0,
-    mapStyleId: 'style1'
-  };
+  const mapOptions = getTencentMapOptions();
 
   const patrolRoute: PatrolCoord[] = [
     { lat: 23.1334, lng: 113.2547 },

@@ -17,7 +17,11 @@
         >
           新建任务
         </el-button>
-        <el-button size="large" :icon="Operation" @click="handleAction('进入调度')">
+        <el-button
+          size="large"
+          :icon="Operation"
+          @click="handleAction('进入调度')"
+        >
           进入调度
         </el-button>
         <el-button
@@ -29,55 +33,51 @@
         </el-button>
       </div>
     </div>
-    <el-row class="monitor-stat-row" :gutter="12">
-      <el-col
+    <div class="monitor-stat-grid">
+      <y-card
         v-for="item in statistics"
         :key="item.title"
-        :lg="4"
-        :md="8"
-        :sm="12"
-        :xs="24"
+        class="monitor-count"
       >
-        <y-card class="monitor-count">
-          <div class="monitor-count-main-row">
-            <div
-              class="monitor-count-icon"
-              :style="{ color: item.color, backgroundColor: item.bgColor }"
-            >
-              <el-icon :size="28">
-                <component :is="item.icon" />
+        <div class="monitor-count-main-row">
+          <div
+            class="monitor-count-icon"
+            :style="{ color: item.color, backgroundColor: item.bgColor }"
+          >
+            <el-icon :size="28">
+              <component :is="item.icon" />
+            </el-icon>
+          </div>
+          <div class="monitor-count-body">
+            <div class="monitor-count-title">{{ item.title }}</div>
+            <div class="monitor-count-main">
+              <span class="monitor-count-value">{{ item.value }}</span>
+              <el-icon v-if="item.valueArrow" class="monitor-count-arrow">
+                <Top />
               </el-icon>
+              <span v-if="item.unit" class="monitor-count-unit">
+                {{ item.unit }}
+              </span>
             </div>
-            <div class="monitor-count-body">
-              <div class="monitor-count-title">{{ item.title }}</div>
-              <div class="monitor-count-main">
-                <span class="monitor-count-value">{{ item.value }}</span>
-                <el-icon v-if="item.valueArrow" class="monitor-count-arrow">
-                  <Top />
-                </el-icon>
-                <span v-if="item.unit" class="monitor-count-unit">
-                  {{ item.unit }}
-                </span>
-              </div>
-              <div class="monitor-count-compare">
-                <span>较昨日</span>
-                <span
-                  class="monitor-count-trend"
-                  :class="{ 'is-danger': item.danger }"
-                >
-                  <el-icon :size="11"><CaretTop /></el-icon>
-                  {{ item.trend }}
-                </span>
-              </div>
+            <div class="monitor-count-compare">
+              <span>较昨日</span>
+              <span
+                class="monitor-count-trend"
+                :class="{ 'is-danger': item.danger }"
+              >
+                <el-icon :size="11"><CaretTop /></el-icon>
+                {{ item.trend }}
+              </span>
             </div>
           </div>
-        </y-card>
-      </el-col>
-    </el-row>
+        </div>
+      </y-card>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+  import { computed, onMounted, ref } from 'vue';
   import {
     DataAnalysis,
     DocumentChecked,
@@ -92,11 +92,25 @@
     Top
   } from '@element-plus/icons-vue';
   import { YMessage } from 'y-element-ultra';
+  import { getClosedLoopSummary } from '@/api/closed-loop';
+  import type { DashboardSummary } from '@/api/closed-loop/model';
 
-  const statistics = [
+  const summary = ref<DashboardSummary>({
+    todayTaskCount: 128,
+    runningTaskCount: 36,
+    completedTaskCount: 92,
+    pendingWorkOrderCount: 27,
+    timeoutWorkOrderCount: 1,
+    aiDetectCount: 36,
+    highRiskCount: 18,
+    closureRate: 92.5,
+    avgHandleTime: '2分30秒'
+  });
+
+  const statistics = computed(() => [
     {
       title: '今日任务数',
-      value: '128',
+      value: String(summary.value.todayTaskCount),
       trend: '12.5%',
       color: '#2563eb',
       bgColor: '#eef4ff',
@@ -105,7 +119,7 @@
     },
     {
       title: '执行中任务',
-      value: '36',
+      value: String(summary.value.runningTaskCount),
       trend: '5.3%',
       color: '#22a957',
       bgColor: '#eaf8ef',
@@ -114,7 +128,7 @@
     },
     {
       title: '已完成任务',
-      value: '92',
+      value: String(summary.value.completedTaskCount),
       trend: '18.7%',
       color: '#1f6feb',
       bgColor: '#eef4ff',
@@ -123,7 +137,7 @@
     },
     {
       title: '异常事件数',
-      value: '18',
+      value: String(summary.value.highRiskCount),
       unit: '件',
       trend: '28.6%',
       color: '#f04438',
@@ -133,7 +147,7 @@
     },
     {
       title: '待处理工单',
-      value: '27',
+      value: String(summary.value.pendingWorkOrderCount),
       unit: '件',
       trend: '12.0%',
       color: '#f59e0b',
@@ -150,7 +164,15 @@
       bgColor: '#eef4ff',
       icon: Printer
     }
-  ];
+  ]);
+
+  onMounted(() => {
+    getClosedLoopSummary()
+      .then((data) => {
+        summary.value = data;
+      })
+      .catch(() => {});
+  });
 
   const handleAction = (label: string) => {
     YMessage.info({ message: label, plain: true });
@@ -200,13 +222,17 @@
     gap: 8px;
   }
 
-  .monitor-stat-row {
-    margin-bottom: 0;
+  .monitor-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 12px;
+    align-items: stretch;
   }
 
   .monitor-count {
+    height: 100%;
     min-height: 96px;
-    padding: 16px 18px 12px;
+    padding: 16px 16px 12px;
     border: 1px solid #e8edf5;
     border-radius: 8px;
     box-shadow: 0 1px 6px rgba(17, 24, 39, 0.08);
@@ -223,8 +249,8 @@
     .monitor-count-main-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 16px;
+      justify-content: flex-start;
+      gap: 14px;
       width: 100%;
     }
 
@@ -243,7 +269,7 @@
       flex-direction: column;
       justify-content: center;
       min-width: 0;
-      flex: 0 1 auto;
+      flex: 1 1 auto;
       text-align: left;
     }
 
@@ -252,6 +278,8 @@
       font-size: 14px;
       font-weight: 600;
       line-height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
@@ -328,6 +356,12 @@
     }
   }
 
+  @media (max-width: 1199px) {
+    .monitor-stat-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    }
+  }
+
   @media (max-width: 768px) {
     .monitor-stat-actions {
       align-items: stretch;
@@ -352,6 +386,10 @@
     .monitor-stat-buttons {
       justify-content: flex-start;
       flex-wrap: wrap;
+    }
+
+    .monitor-stat-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
     }
   }
 </style>

@@ -30,6 +30,23 @@
           placeholder="请输入字典数据值"
         />
       </el-form-item>
+      <el-form-item label="颜色">
+        <div class="dict-color-row">
+          <el-color-picker v-model="form.color" />
+          <el-input
+            clearable
+            :maxlength="30"
+            v-model="form.color"
+            placeholder="请选择或输入颜色"
+          />
+        </div>
+      </el-form-item>
+      <el-form-item label="开启波纹">
+        <el-switch
+          :model-value="form.ripple === 1"
+          @update:modelValue="(value) => (form.ripple = value ? 1 : 0)"
+        />
+      </el-form-item>
       <el-form-item label="排序号" prop="sortNumber">
         <el-input-number
           :min="0"
@@ -99,6 +116,8 @@
     dictDataId: void 0,
     dictDataName: '',
     dictDataCode: '',
+    color: '',
+    ripple: 0,
     sortNumber: void 0,
     comments: ''
   });
@@ -166,6 +185,20 @@
   /** 修改赋值 */
   if (props.data) {
     assignFields(props.data);
+    form.ripple = props.data.ripple ? 1 : 0;
     isUpdate.value = true;
   }
 </script>
+
+<style lang="scss" scoped>
+  .dict-color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+
+    .el-input {
+      flex: 1;
+    }
+  }
+</style>

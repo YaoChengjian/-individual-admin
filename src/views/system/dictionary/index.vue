@@ -141,6 +141,22 @@
                 ]"
               />
             </template>
+            <template #color="{ row }">
+              <span v-if="row.color" class="dict-color-cell">
+                <span class="dict-color-swatch" :style="{ background: row.color }" />
+                <span>{{ row.color }}</span>
+              </span>
+              <span v-else>-</span>
+            </template>
+            <template #ripple="{ row }">
+              <el-tag
+                size="small"
+                :type="row.ripple ? 'success' : 'info'"
+                :disable-transitions="true"
+              >
+                {{ row.ripple ? '开启' : '关闭' }}
+              </el-tag>
+            </template>
           </y-pro-table>
         </template>
       </y-split-panel>
@@ -300,6 +316,20 @@
       minWidth: 120
     },
     {
+      prop: 'color',
+      label: '颜色',
+      width: 130,
+      align: 'center',
+      slot: 'color'
+    },
+    {
+      prop: 'ripple',
+      label: '波纹',
+      width: 90,
+      align: 'center',
+      slot: 'ripple'
+    },
+    {
       prop: 'sortNumber',
       label: '排序号',
       sortable: 'custom',
@@ -399,3 +429,18 @@
   /** 查询树数据 */
   query();
 </script>
+
+<style lang="scss" scoped>
+  .dict-color-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dict-color-swatch {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--el-border-color);
+    border-radius: 50%;
+  }
+</style>

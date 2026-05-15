@@ -99,10 +99,7 @@
         h(
           'span',
           {
-            class: [
-              'device-icon',
-              props.online ? 'is-online' : 'is-offline'
-            ]
+            class: ['device-icon', props.online ? 'is-online' : 'is-offline']
           },
           slots.default?.()
         );
