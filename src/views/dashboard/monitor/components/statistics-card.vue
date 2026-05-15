@@ -1,177 +1,309 @@
 <!-- 统计卡片 -->
 <template>
-  <el-row :gutter="16">
-    <el-col :md="6" :sm="12" :xs="24">
-      <y-card class="monitor-count">
-        <el-tag size="large" :disable-transitions="true">
-          <el-icon>
-            <UserFilled />
-          </el-icon>
-        </el-tag>
-        <y-text size="xxl" class="monitor-count-value">21.2 k</y-text>
-        <y-text type="placeholder" class="monitor-count-text">
-          总访问人数
-        </y-text>
-        <y-avatar-group :data="visitUsers" size="small" :max-count="4" />
-      </y-card>
-    </el-col>
-    <el-col :md="6" :sm="12" :xs="24">
-      <y-card class="monitor-count">
-        <el-tag type="warning" size="large" :disable-transitions="true">
-          <el-icon>
-            <Opportunity />
-          </el-icon>
-        </el-tag>
-        <y-text size="xxl" class="monitor-count-value">1.6 k</y-text>
-        <y-text type="placeholder" class="monitor-count-text">
-          点击量(近30天)
-        </y-text>
-        <y-text
-          strong
-          type="success"
-          :icon="ArrowUpBold"
-          class="monitor-count-trend"
+  <div class="monitor-stat-wrap">
+    <div class="monitor-stat-actions">
+      <div class="monitor-stat-heading">
+        <div class="monitor-stat-title">指挥中心预览</div>
+        <div class="monitor-stat-subtitle">
+          智能巡查任务运行总览与闭环处置态势
+        </div>
+      </div>
+      <div class="monitor-stat-buttons">
+        <el-button
+          type="primary"
+          size="large"
+          :icon="DocumentAdd"
+          @click="handleAction('新建任务')"
         >
-          &nbsp;110.5%
-        </y-text>
-        <y-tooltip content="指标说明" placement="top" :offset="3">
-          <y-text
-            :icon="QuestionCircleOutlined"
-            type="placeholder"
-            class="monitor-count-tip"
-          />
-        </y-tooltip>
-      </y-card>
-    </el-col>
-    <el-col :md="6" :sm="12" :xs="24">
-      <y-card class="monitor-count">
-        <el-tag type="danger" size="large" :disable-transitions="true">
-          <el-icon>
-            <Flag />
-          </el-icon>
-        </el-tag>
-        <y-text size="xxl" class="monitor-count-value">826.0</y-text>
-        <y-text type="placeholder" class="monitor-count-text">
-          到达量(近30天)
-        </y-text>
-        <y-text
-          strong
-          type="danger"
-          :icon="ArrowDownBold"
-          class="monitor-count-trend"
+          新建任务
+        </el-button>
+        <el-button size="large" :icon="Operation" @click="handleAction('进入调度')">
+          进入调度
+        </el-button>
+        <el-button
+          size="large"
+          :icon="DataAnalysis"
+          @click="handleAction('查看报告')"
         >
-          &nbsp;15.5%
-        </y-text>
-      </y-card>
-    </el-col>
-    <el-col :md="6" :sm="12" :xs="24">
-      <y-card class="monitor-count">
-        <el-tag type="success" size="large" :disable-transitions="true">
-          <el-icon>
-            <Share />
-          </el-icon>
-        </el-tag>
-        <y-text size="xxl" class="monitor-count-value">28.8 %</y-text>
-        <y-text type="placeholder" class="monitor-count-text">
-          转化率(近30天)
-        </y-text>
-        <y-text
-          strong
-          type="success"
-          :icon="ArrowUpBold"
-          class="monitor-count-trend"
-        >
-          &nbsp;65.8%
-        </y-text>
-        <y-tooltip content="指标说明" placement="top" :offset="3">
-          <y-text
-            :icon="QuestionCircleOutlined"
-            type="placeholder"
-            class="monitor-count-tip"
-          />
-        </y-tooltip>
-      </y-card>
-    </el-col>
-  </el-row>
+          查看报告
+        </el-button>
+      </div>
+    </div>
+    <el-row class="monitor-stat-row" :gutter="12">
+      <el-col
+        v-for="item in statistics"
+        :key="item.title"
+        :lg="4"
+        :md="8"
+        :sm="12"
+        :xs="24"
+      >
+        <y-card class="monitor-count">
+          <div class="monitor-count-main-row">
+            <div
+              class="monitor-count-icon"
+              :style="{ color: item.color, backgroundColor: item.bgColor }"
+            >
+              <el-icon :size="28">
+                <component :is="item.icon" />
+              </el-icon>
+            </div>
+            <div class="monitor-count-body">
+              <div class="monitor-count-title">{{ item.title }}</div>
+              <div class="monitor-count-main">
+                <span class="monitor-count-value">{{ item.value }}</span>
+                <el-icon v-if="item.valueArrow" class="monitor-count-arrow">
+                  <Top />
+                </el-icon>
+                <span v-if="item.unit" class="monitor-count-unit">
+                  {{ item.unit }}
+                </span>
+              </div>
+              <div class="monitor-count-compare">
+                <span>较昨日</span>
+                <span
+                  class="monitor-count-trend"
+                  :class="{ 'is-danger': item.danger }"
+                >
+                  <el-icon :size="11"><CaretTop /></el-icon>
+                  {{ item.trend }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </y-card>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import type { AvatarItem } from 'y-element-ultra/es/y-avatar-group/types';
   import {
-    UserFilled,
-    Opportunity,
-    Flag,
-    Share,
-    ArrowUpBold,
-    ArrowDownBold
+    DataAnalysis,
+    DocumentChecked,
+    DocumentAdd,
+    VideoPlay,
+    CircleCheckFilled,
+    WarningFilled,
+    Document,
+    Operation,
+    Printer,
+    CaretTop,
+    Top
   } from '@element-plus/icons-vue';
-  import { QuestionCircleOutlined } from '@/components/icons';
+  import { YMessage } from 'y-element-ultra';
 
-  /** 访问人数 */
-  const visitUsers = ref<AvatarItem[]>([
+  const statistics = [
     {
-      key: 1,
-      label: 'SunSmile',
-      value:
-        'https://cdn.eleadmin.com/20200609/c184eef391ae48dba87e3057e70238fb.jpg'
+      title: '今日任务数',
+      value: '128',
+      trend: '12.5%',
+      color: '#2563eb',
+      bgColor: '#eef4ff',
+      valueArrow: true,
+      icon: DocumentChecked
     },
     {
-      key: 2,
-      label: '你的名字很好听',
-      value:
-        'https://cdn.eleadmin.com/20200609/b6a811873e704db49db994053a5019b2.jpg'
+      title: '执行中任务',
+      value: '36',
+      trend: '5.3%',
+      color: '#22a957',
+      bgColor: '#eaf8ef',
+      valueArrow: true,
+      icon: VideoPlay
     },
     {
-      key: 3,
-      label: '全村人的希望',
-      value:
-        'https://cdn.eleadmin.com/20200609/948344a2a77c47a7a7b332fe12ff749a.jpg'
+      title: '已完成任务',
+      value: '92',
+      trend: '18.7%',
+      color: '#1f6feb',
+      bgColor: '#eef4ff',
+      valueArrow: true,
+      icon: CircleCheckFilled
     },
     {
-      key: 4,
-      label: 'Jasmine',
-      value:
-        'https://cdn.eleadmin.com/20200609/f6bc05af944a4f738b54128717952107.jpg'
+      title: '异常事件数',
+      value: '18',
+      unit: '件',
+      trend: '28.6%',
+      color: '#f04438',
+      bgColor: '#fff0ed',
+      danger: true,
+      icon: WarningFilled
     },
     {
-      key: 5,
-      label: '酷酷的大叔',
-      value:
-        'https://cdn.eleadmin.com/20200609/2d98970a51b34b6b859339c96b240dcd.jpg'
+      title: '待处理工单',
+      value: '27',
+      unit: '件',
+      trend: '12.0%',
+      color: '#f59e0b',
+      bgColor: '#fff4e5',
+      danger: true,
+      icon: Document
     },
     {
-      key: 6,
-      label: '管理员',
-      value: 'https://cdn.eleadmin.com/20200610/avatar.jpg'
+      title: '今日打印文书数',
+      value: '46',
+      unit: '份',
+      trend: '15.0%',
+      color: '#1f6feb',
+      bgColor: '#eef4ff',
+      icon: Printer
     }
-  ]);
+  ];
+
+  const handleAction = (label: string) => {
+    YMessage.info({ message: label, plain: true });
+  };
 </script>
 
 <style lang="scss" scoped>
-  .monitor-count {
-    position: relative;
-    text-align: center;
+  .monitor-stat-wrap {
+    margin-bottom: 16px;
+  }
 
-    .el-tag {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      font-size: 16px;
-      line-height: 0;
+  .monitor-stat-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .monitor-stat-heading {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .monitor-stat-title {
+    min-width: 0;
+    color: #1f2937;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 36px;
+  }
+
+  .monitor-stat-subtitle {
+    color: #d9d9d9;
+    font-size: 13px;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  .monitor-stat-buttons {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .monitor-stat-row {
+    margin-bottom: 0;
+  }
+
+  .monitor-count {
+    min-height: 96px;
+    padding: 16px 18px 12px;
+    border: 1px solid #e8edf5;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(17, 24, 39, 0.08);
+
+    :deep(.el-card__body) {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      min-height: 68px;
       padding: 0;
     }
 
-    .monitor-count-value {
-      margin-top: 8px;
+    .monitor-count-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
     }
 
-    .monitor-count-text {
-      margin: 4px 0 8px 0;
+    .monitor-count-icon {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+    }
+
+    .monitor-count-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      flex: 0 1 auto;
+      text-align: left;
+    }
+
+    .monitor-count-title {
+      color: #4b5563;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .monitor-count-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+      color: #111827;
+      line-height: 34px;
+    }
+
+    .monitor-count-value {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .monitor-count-arrow {
+      margin-left: 2px;
+      color: #9aa4b2;
+      font-size: 16px;
+    }
+
+    .monitor-count-unit {
+      color: #4b5563;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .monitor-count-compare {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 7px;
+      margin-top: 4px;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 18px;
+      white-space: nowrap;
     }
 
     .monitor-count-trend {
-      line-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      color: #20b56b;
+      font-weight: 700;
+
+      &.is-danger {
+        color: #ff3b30;
+      }
     }
 
     .monitor-count-tip {
@@ -180,6 +312,46 @@
       right: 16px;
       font-size: 15px;
       cursor: help;
+    }
+  }
+
+  @media (max-width: 1399px) {
+    .monitor-count {
+      .monitor-count-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .monitor-count-value {
+        font-size: 30px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .monitor-stat-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .monitor-stat-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .monitor-stat-title {
+      font-size: 22px;
+      line-height: 30px;
+    }
+
+    .monitor-stat-subtitle {
+      white-space: normal;
+    }
+
+    .monitor-stat-buttons {
+      justify-content: flex-start;
+      flex-wrap: wrap;
     }
   }
 </style>

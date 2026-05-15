@@ -14,6 +14,7 @@ import './styles/themes/rounded.scss';
 import './styles/themes/dark.scss';
 import './styles/themes/transparent.scss';
 import './styles/index.scss';
+import './styles/tailwind.css';
 
 const app = createApp(App);
 

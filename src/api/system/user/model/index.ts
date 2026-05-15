@@ -3,30 +3,6 @@ import type { Role } from '../../role/model';
 import type { Menu } from '../../menu/model';
 
 /**
- * 用户可访问的租户
- */
-export interface TenantAccess {
-  /** 租户id */
-  tenantId?: number;
-  /** 租户编码 */
-  tenantCode?: string;
-  /** 租户名称 */
-  tenantName?: string;
-  /** 隔离级别 */
-  isolationLevel?: string;
-  /** 租户状态 */
-  status?: number;
-  /** 成员id */
-  memberId?: number;
-  /** 机构id */
-  organizationId?: number;
-  /** 是否租户拥有者 */
-  isOwner?: number;
-  /** 是否租户管理员 */
-  isAdmin?: number;
-}
-
-/**
  * 用户
  */
 export interface User {
@@ -58,26 +34,6 @@ export interface User {
   sexName?: string;
   /** 机构名称 */
   organizationName?: string;
-  /** 当前租户id */
-  tenantId?: number;
-  /** 当前租户编码 */
-  tenantCode?: string;
-  /** 当前租户名称 */
-  tenantName?: string;
-  /** 当前成员id */
-  memberId?: number;
-  /** 是否租户拥有者 */
-  isOwner?: number;
-  /** 是否租户管理员 */
-  isAdmin?: number;
-  /** 数据权限 */
-  dataScope?: string;
-  /** 最近活跃时间 */
-  lastActiveAt?: string;
-  /** 是否平台管理员 */
-  isPlatformAdmin?: boolean;
-  /** 可访问租户列表 */
-  tenantList?: TenantAccess[];
   /** 角色列表 */
   roles?: Role[];
   /** 权限列表 */

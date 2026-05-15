@@ -24,7 +24,7 @@
       >
         <template #logo>
           <div style="display: flex; align-items: center; gap: 4px">
-            <img src="@/assets/logo.svg" style="width: 22px; height: 22px" />
+            <img src="@/assets/logo.png" style="width: 22px; height: 22px" />
             <h1>Y Admin</h1>
           </div>
           <h1>后台管理模板系统</h1>
@@ -161,10 +161,6 @@
             title: '机构管理'
           },
           {
-            index: '/system/tenant',
-            title: '租户管理'
-          },
-          {
             index: '/system/dictionary',
             title: '字典管理'
           }
@@ -180,10 +176,6 @@
           {
             index: '/data/operation',
             title: '运营数据'
-          },
-          {
-            index: '/data/member',
-            title: '会员数据'
           },
           {
             index: '/data/sell',

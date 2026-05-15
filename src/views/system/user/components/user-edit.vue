@@ -28,13 +28,6 @@
               :disabled="isUpdate"
             />
           </el-form-item>
-          <div v-if="!isUpdate" class="form-help">
-            {{
-              reuseExistingAccount
-                ? '检测到已有平台账号，保存后会直接加入当前租户，原密码不会变。'
-                : '已有账号可直接加入当前租户，无需重复创建账号。'
-            }}
-          </div>
           <el-form-item label="用户名" prop="nickname">
             <el-input
               clearable
@@ -142,9 +135,6 @@
   /** 提交状态 */
   const loading = ref(false);
 
-  /** 是否复用已有平台账号 */
-  const reuseExistingAccount = ref(false);
-
   /** 表单组件 */
   const formRef = ref<FormInstance | null>(null);
 
@@ -184,25 +174,15 @@
         trigger: 'blur',
         validator: (_rule: any, value: string, callback: any) => {
           if (isUpdate.value) {
-            reuseExistingAccount.value = false;
             callback();
             return;
           }
-          checkExistence('username', value, void 0, true)
+          checkExistence('username', value)
             .then(() => {
-              reuseExistingAccount.value = false;
-              callback(new Error('该账号已是当前租户成员'));
+              callback(new Error('该账号已存在'));
             })
             .catch(() => {
-              checkExistence('username', value)
-                .then(() => {
-                  reuseExistingAccount.value = true;
-                  callback();
-                })
-                .catch(() => {
-                  reuseExistingAccount.value = false;
-                  callback();
-                });
+              callback();
             });
         }
       }
@@ -249,10 +229,6 @@
             return;
           }
           if (!value) {
-            if (reuseExistingAccount.value) {
-              callback();
-              return;
-            }
             callback(new Error('请输入登录密码'));
             return;
           }
@@ -313,12 +289,3 @@
     isUpdate.value = true;
   }
 </script>
-
-<style lang="scss" scoped>
-  .form-help {
-    margin: -4px 0 12px 80px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-    line-height: 1.5;
-  }
-</style>

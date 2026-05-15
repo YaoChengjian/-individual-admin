@@ -443,7 +443,7 @@ export function changeTheme(
       !skinCfg.overlayMaskColor)
   );
   changeColor(
-    isTransparent ? (color ?? '#2f54eb') : color,
+    isTransparent ? (color ?? '#1452d9') : color,
     dark,
     isTransparent
   );

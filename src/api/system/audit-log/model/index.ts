@@ -5,9 +5,7 @@ import type { PageParam } from '@/api';
  */
 export interface AuditLog {
   id?: number;
-  tenantId?: number;
   actorUserId?: number;
-  actorMemberId?: number;
   actorName?: string;
   auditType?: string;
   targetType?: string;

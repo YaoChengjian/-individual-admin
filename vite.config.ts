@@ -3,6 +3,8 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import { resolve } from 'path';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
 import Compression from 'vite-plugin-compression';
 import Components from 'unplugin-vue-components/vite';
 import type { ComponentResolver } from 'unplugin-vue-components/types';
@@ -81,6 +83,9 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins,
     css: {
+      postcss: {
+        plugins: [tailwindcss({ config: './tailwind.config.cjs' }), autoprefixer()]
+      },
       preprocessorOptions: {
         scss: {
           additionalData: `@use "@/styles/variables.scss" as *;`

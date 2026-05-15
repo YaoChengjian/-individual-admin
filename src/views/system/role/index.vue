@@ -54,15 +54,6 @@
             ]"
           />
         </template>
-        <template #dataScope="{ row }">
-          <el-tag
-            size="small"
-            :type="dataScopeTagType[row.dataScope || 'tenant'] || 'info'"
-            :disable-transitions="true"
-          >
-            {{ dataScopeLabel[row.dataScope || 'tenant'] || row.dataScope }}
-          </el-tag>
-        </template>
         <template #isSystemRole="{ row }">
           <el-tag
             size="small"
@@ -70,15 +61,6 @@
             :disable-transitions="true"
           >
             {{ row.isSystemRole ? '内置' : '自定义' }}
-          </el-tag>
-        </template>
-        <template #scopeType="{ row }">
-          <el-tag
-            size="small"
-            :type="scopeTagType[row.scopeType || 'tenant'] || 'success'"
-            :disable-transitions="true"
-          >
-            {{ scopeLabel[row.scopeType || 'tenant'] || row.scopeType }}
           </el-tag>
         </template>
       </y-pro-table>
@@ -103,34 +85,6 @@
   defineOptions({ name: 'SystemRole' });
 
   const { openModal } = useModal();
-
-  /** 数据权限展示 */
-  const dataScopeLabel: Record<string, string> = {
-    self: '仅本人',
-    organization: '本机构',
-    tenant: '当前租户',
-    all: '全部数据'
-  };
-
-  /** 数据权限标签样式 */
-  const dataScopeTagType: Record<string, 'success' | 'warning' | 'info' | 'danger'> = {
-    self: 'info',
-    organization: 'warning',
-    tenant: 'success',
-    all: 'danger'
-  };
-
-  /** 作用域展示 */
-  const scopeLabel: Record<string, string> = {
-    platform: '平台',
-    tenant: '租户'
-  };
-
-  /** 作用域标签样式 */
-  const scopeTagType: Record<string, 'warning' | 'success'> = {
-    platform: 'warning',
-    tenant: 'success'
-  };
 
   /** 表格实例 */
   const tableRef = ref<InstanceType<typeof YProTable> | null>(null);
@@ -161,20 +115,6 @@
       label: '角色标识',
       sortable: 'custom',
       minWidth: 120
-    },
-    {
-      prop: 'scopeType',
-      label: '作用域',
-      width: 100,
-      align: 'center',
-      slot: 'scopeType'
-    },
-    {
-      prop: 'dataScope',
-      label: '数据权限',
-      width: 110,
-      align: 'center',
-      slot: 'dataScope'
     },
     {
       prop: 'isSystemRole',

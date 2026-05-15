@@ -106,8 +106,64 @@
 }
 
 /* 主色顶栏 logo 增加白色滤镜 */
-.y-admin-header.is-primary .y-admin-logo img {
+.y-admin-header.is-primary .y-admin-logo img:not(.app-logo) {
   filter: contrast(0%) brightness(1000%);
+}
+
+/* 顶栏 logo 区域 */
+.y-admin-header > .y-admin-logo {
+  width: 360px;
+  min-width: 360px;
+  margin-left: 0 !important;
+  padding: 0 18px;
+  color: #fff !important;
+  background: #021236;
+  box-sizing: border-box;
+  justify-content: flex-start;
+
+  h1 {
+    flex: 1;
+    min-width: 0;
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-logo {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+}
+
+.y-admin-side > .y-admin-sidebar > .y-admin-logo,
+.y-admin-side > .y-admin-sidebox > .y-admin-logo {
+  color: #fff !important;
+  background: #021236;
+}
+
+/* 左侧菜单背景 */
+.y-admin-side {
+  & > .y-admin-sidebar,
+  & > .y-admin-sidebox {
+    overflow: hidden;
+    background-image: url('@/assets/menu-bg.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: center bottom !important;
+    background-size: cover !important;
+
+    & > .y-admin-logo,
+    & > .y-admin-logo-title,
+    & > .y-admin-menus {
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+.y-menu.is-night.el-menu--vertical .el-sub-menu > .el-menu {
+  background: none !important;
 }
 
 /* 卡片风格布局 */

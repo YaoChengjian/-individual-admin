@@ -2,10 +2,6 @@
   <div class="login-wrapper">
     <div class="login-main">
       <y-card shadow="always" class="login-card">
-        <div class="login-cover">
-          <h1 class="login-title">{{ PROJECT_NAME }}</h1>
-          <h4 class="login-subtitle">界面美观组件丰富的中后台前端解决方案</h4>
-        </div>
         <div class="login-body">
           <y-text type="heading" style="font-size: 24px; margin-bottom: 18px">
             {{ t('login.title') }}
@@ -99,7 +95,6 @@
         </div>
       </y-card>
     </div>
-    <PageFooter style="padding-top: 0" />
   </div>
 </template>
 
@@ -113,11 +108,9 @@
     ProtectOutlined,
     ReloadOutlined
   } from '@/components/icons';
-  import PageFooter from '@/layout/components/page-footer.vue';
   import { useLogin } from '@/utils/use-login';
   import { getCaptcha } from '@/api/login';
   import { useI18n } from 'vue-i18n';
-  const PROJECT_NAME = import.meta.env.VITE_APP_NAME;
 
   const { login, checkLogin, handleLoginSuccess } = useLogin();
   const { t } = useI18n();
@@ -133,7 +126,6 @@
 
   /** 表单数据 */
   const form = reactive({
-    tenantId: void 0 as number | undefined,
     username: 'admin',
     password: 'admin',
     code: '',
@@ -258,9 +250,10 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    background-image: url('@/assets/login-bg.png');
+    background-image: url('@/assets/login/login-bg.png');
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-position: center;
+    background-size: cover;
 
     .login-main {
       flex: auto;
@@ -273,33 +266,19 @@
     }
 
     .login-card {
-      width: 920px;
+      width: 400px;
       max-width: 100%;
       overflow: hidden;
 
       :deep(.y-card-body) {
-        display: flex;
         padding: 0;
         height: 462px;
       }
     }
   }
 
-  .login-cover {
-    flex: 1;
-    padding: 32px 8px;
-    box-sizing: border-box;
-    background-color: #1681fd;
-    background-image: url('@/assets/login-img.png');
-    background-repeat: no-repeat;
-    background-position: bottom;
-    background-size: contain;
-    text-align: center;
-  }
-
   .login-body {
-    width: 400px;
-    flex-shrink: 0;
+    width: 100%;
     padding: 32px 48px 0 48px;
     box-sizing: border-box;
 
@@ -353,27 +332,6 @@
     }
   }
 
-  /* 标题 */
-  .login-title {
-    color: rgba(255, 255, 255, 0.98);
-    font-size: 28px;
-    margin: 0 0 6px 0;
-    font-weight: normal;
-    letter-spacing: 1.2px;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-      Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-      'Segoe UI Symbol', 'Noto Color Emoji';
-  }
-
-  .login-subtitle {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 16px;
-    margin: 0;
-    font-weight: normal;
-    letter-spacing: 4px;
-  }
-
   /* 二维码 */
   .login-qrcode-group {
     display: flex;
@@ -411,11 +369,6 @@
           height: auto;
         }
       }
-    }
-
-    .login-cover {
-      padding: 20px 12px 100px 12px;
-      background-size: auto 100px;
     }
 
     .login-body {

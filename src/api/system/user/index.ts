@@ -149,14 +149,12 @@ export async function importUsers(file: File) {
 export async function checkExistence(
   field: string,
   value: string,
-  id?: number,
-  tenantOnly = false
+  id?: number
 ) {
   const res = await request.post<ApiResult<unknown>>('/system/user/existence', {
     field,
     value,
-    id,
-    tenantOnly
+    id
   });
   if (res.data.code === 0) {
     return res.data.message;

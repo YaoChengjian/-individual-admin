@@ -1,7 +1,6 @@
 import request from '@/utils/https';
 import type { ApiResult } from '@/api';
 import type { User } from '@/api/system/user/model';
-import type { LoginResult } from '@/api/login/model';
 import type { UpdatePasswordParam } from './model';
 
 /**
@@ -39,19 +38,6 @@ export async function updatePassword(
  */
 export async function updateUserInfo(data: User): Promise<User> {
   const res = await request.post<ApiResult<User>>('/auth/user/update', data);
-  if (res.data.code === 0 && res.data.data) {
-    return res.data.data;
-  }
-  return Promise.reject(new Error(res.data.message));
-}
-
-/**
- * 切换当前租户
- */
-export async function switchTenant(tenantId?: number): Promise<LoginResult> {
-  const res = await request.post<ApiResult<LoginResult>>('/auth/tenant/switch', {
-    tenantId
-  });
   if (res.data.code === 0 && res.data.data) {
     return res.data.data;
   }

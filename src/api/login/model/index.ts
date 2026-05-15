@@ -8,8 +8,6 @@ export interface LoginParam {
   username?: string;
   /** 密码 */
   password?: string;
-  /** 租户id */
-  tenantId?: number;
   /** 是否记住密码 */
   remember?: boolean;
 }

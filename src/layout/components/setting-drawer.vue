@@ -397,7 +397,7 @@
     }
 
     .y-setting-layout-cover-bg-blue-dark {
-      background: #2f54eb;
+      background: #1452d9;
     }
 
     .y-setting-layout-cover-border-lighter {

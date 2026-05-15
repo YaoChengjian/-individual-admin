@@ -101,11 +101,11 @@ const DEFAULT_STATE: ThemeState = {
   /** 顶栏风格 */
   headerStyle: 'light',
   /** 侧栏风格 */
-  sidebarStyle: 'light',
+  sidebarStyle: 'dark',
   /** 双侧栏二级风格 */
   mixSidebarStyle: 'light',
   /** 页签风格 */
-  tabStyle: 'simple',
+  tabStyle: 'tag',
   /** 是否固定顶栏 */
   fixedHeader: true,
   /** 是否固定侧栏 */
@@ -115,7 +115,7 @@ const DEFAULT_STATE: ThemeState = {
   /** 内容区是否撑满 */
   fluid: true,
   /** 图标是否置于顶栏 */
-  logoInHeader: false,
+  logoInHeader: true,
   /** 侧栏菜单是否彩色图标 */
   colorfulIcon: false,
   /** 侧栏排他展开 */
@@ -163,7 +163,7 @@ const DEFAULT_STATE: ThemeState = {
   /** 皮肤背景配置 */
   skinConfig: null,
   /** 常用布局名称 */
-  layoutName: null,
+  layoutName: 'verticalLayout',
   /** 是否开启响应式 */
   responsive: true
 };
@@ -244,7 +244,7 @@ export const useThemeStore = defineStore('theme', {
         if (dark == null && this.skinConfig == null) {
           const temp = this.setThemeConfig(cloneDeep(DEFAULT_STATE));
           Object.assign(obj, temp);
-          this.layoutName = null;
+          this.layoutName = DEFAULT_STATE.layoutName;
         } else {
           const layouts = this.skinConfig?.layouts || [];
           const layoutItem =

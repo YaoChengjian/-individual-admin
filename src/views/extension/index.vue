@@ -402,17 +402,6 @@
           () => import('@/views/extension/user-select/index.vue')
         )
       }
-    },
-    {
-      index: 'input',
-      path: '/extension?name=input',
-      title: '多类型输入框',
-      icon: LinkOutlined,
-      meta: {
-        component: defineAsyncComponent(
-          () => import('@/views/extension/input/index.vue')
-        )
-      }
     }
   ];
 

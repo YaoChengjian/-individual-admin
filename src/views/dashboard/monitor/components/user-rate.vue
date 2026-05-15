@@ -1,146 +1,174 @@
 <template>
-  <y-card header="用户评价">
-    <div class="rate-header">
-      <div class="rate-header-value">4.5</div>
-      <div class="rate-header-level">
-        <el-rate :model-value="userRate" disabled />
-        <div class="rate-header-text">很棒</div>
-      </div>
-    </div>
-    <y-text type="placeholder" class="rate-body">
-      <div class="rate-body-value">-0%</div>
-      <div class="rate-body-text">当前没有评价波动</div>
-    </y-text>
-    <div class="rate-item">
-      <div class="rate-item-progress">
-        <el-progress
-          color="#52c41a"
-          :percentage="60"
-          :show-text="false"
-          :stroke-width="8"
+  <y-card
+    header="待处理工单"
+    :body-style="{ padding: '10px', height: '310px' }"
+    class="pending-workorder-card"
+  >
+    <y-pro-table
+      row-key="code"
+      :columns="columns"
+      :datasource="workorders"
+      :show-overflow-tooltip="true"
+      :pagination="false"
+      :toolbar="false"
+      :bottom-line="false"
+      highlight-current-row
+      size="large"
+      class="pending-workorder-table"
+    >
+      <template #status="{ row }">
+        <y-dot
+          v-if="row"
+          :text="row.status"
+          :type="row.statusType"
+          :color="row.statusColor"
+          size="7px"
+          ripple
+          class="workorder-status"
+          :class="row.statusClass"
         />
-      </div>
-      <y-text type="placeholder" :icon="StarFilled" class="rate-item-text">
-        <span>5 : 368 人</span>
-      </y-text>
-    </div>
-    <div class="rate-item">
-      <div class="rate-item-progress">
-        <el-progress
-          color="#1890ff"
-          :percentage="40"
-          :show-text="false"
-          :stroke-width="8"
-        />
-      </div>
-      <y-text type="placeholder" :icon="StarFilled" class="rate-item-text">
-        <span>4 : 256 人</span>
-      </y-text>
-    </div>
-    <div class="rate-item">
-      <div class="rate-item-progress">
-        <el-progress
-          color="#faad14"
-          :percentage="20"
-          :show-text="false"
-          :stroke-width="8"
-        />
-      </div>
-      <y-text type="placeholder" :icon="StarFilled" class="rate-item-text">
-        <span>3 : 49 人</span>
-      </y-text>
-    </div>
-    <div class="rate-item">
-      <div class="rate-item-progress">
-        <el-progress
-          color="#f5222d"
-          :percentage="10"
-          :show-text="false"
-          :stroke-width="8"
-        />
-      </div>
-      <y-text type="placeholder" :icon="StarFilled" class="rate-item-text">
-        <span>2 : 14 人</span>
-      </y-text>
-    </div>
-    <div class="rate-item">
-      <div class="rate-item-progress">
-        <el-progress :percentage="0" :show-text="false" :stroke-width="8" />
-      </div>
-      <y-text type="placeholder" :icon="StarFilled" class="rate-item-text">
-        <span>1 : 0 人</span>
-      </y-text>
-    </div>
+      </template>
+    </y-pro-table>
   </y-card>
 </template>
 
 <script lang="ts" setup>
   import { ref } from 'vue';
-  import { StarFilled } from '@/components/icons';
+  import type { Columns } from 'y-element-ultra/es/y-pro-table/types';
 
-  /** 用户评分 */
-  const userRate = ref(4.5);
+  type WorkorderStatus = '待处理' | '待派单' | '处理中' | '已完成';
+
+  interface Workorder {
+    code: string;
+    title: string;
+    reporter: string;
+    status: WorkorderStatus;
+    reportTime: string;
+    statusType?: 'success' | 'warning' | 'danger';
+    statusColor?: string;
+    statusClass: string;
+  }
+
+  const columns = ref<Columns>([
+    {
+      prop: 'code',
+      label: '工单编号',
+      minWidth: 130
+    },
+    {
+      prop: 'title',
+      label: '事件标题',
+      minWidth: 180
+    },
+    {
+      prop: 'reporter',
+      label: '上报人',
+      width: 110,
+      align: 'center'
+    },
+    {
+      prop: 'status',
+      label: '状态',
+      width: 120,
+      align: 'center',
+      slot: 'status'
+    },
+    {
+      prop: 'reportTime',
+      label: '上报时间',
+      width: 150,
+      align: 'center'
+    }
+  ]);
+
+  const workorders = ref<Workorder[]>([
+    {
+      code: 'GD20260515001',
+      title: '巡查点位围挡破损',
+      reporter: '陈志强',
+      status: '待处理',
+      reportTime: '05-15 09:12:18',
+      statusType: 'danger',
+      statusClass: 'is-pending'
+    },
+    {
+      code: 'GD20260515002',
+      title: '商户占道经营待核查',
+      reporter: '李雨晴',
+      status: '待派单',
+      reportTime: '05-15 09:18:43',
+      statusType: 'warning',
+      statusClass: 'is-wait-dispatch'
+    },
+    {
+      code: 'GD20260515003',
+      title: '门头招牌异常识别',
+      reporter: '王浩',
+      status: '处理中',
+      reportTime: '05-15 09:26:05',
+      statusColor: 'var(--el-color-primary)',
+      statusClass: 'is-processing'
+    },
+    {
+      code: 'GD20260515004',
+      title: '整改通知书已送达',
+      reporter: '赵敏',
+      status: '已完成',
+      reportTime: '05-15 09:31:22',
+      statusType: 'success',
+      statusClass: 'is-finished'
+    },
+    {
+      code: 'GD20260515005',
+      title: '垃圾堆放超时未清理',
+      reporter: '周凯',
+      status: '待处理',
+      reportTime: '05-15 09:42:36',
+      statusType: 'danger',
+      statusClass: 'is-pending'
+    }
+  ]);
 </script>
 
 <style lang="scss" scoped>
-  .rate-header {
-    display: flex;
-    align-items: flex-end;
-
-    .rate-header-value {
-      line-height: 1;
-      font-size: 50px;
-    }
-
-    .rate-header-level {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      padding-left: 12px;
-    }
-
-    .rate-header-text {
-      color: #f7ba2a;
-      margin-left: 4px;
+  .pending-workorder-card {
+    :deep(.el-card__body) {
+      overflow: hidden;
     }
   }
 
-  .rate-body {
-    display: flex;
-    align-items: flex-end;
-    margin: 18px 0;
+  .pending-workorder-table {
+    height: 100%;
 
-    .rate-body-value {
-      font-size: 28px;
-      line-height: 1;
+    :deep(.y-pro-table) {
+      height: 100%;
     }
 
-    .rate-body-text {
-      flex: 1;
-      font-size: 12px;
-      padding-left: 12px;
+    :deep(.y-dot-text) {
+      color: inherit;
+      margin-left: 6px;
+      font-weight: 700;
     }
   }
 
-  .rate-item {
-    display: flex;
-    align-items: center;
+  .workorder-status {
+    font-size: 13px;
+    font-weight: 700;
 
-    .rate-item-progress {
-      flex: 1;
+    &.is-finished {
+      color: var(--el-color-success);
     }
 
-    .rate-item-text {
-      width: 90px;
-      flex-shrink: 0;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
+    &.is-processing {
+      color: var(--el-color-primary);
+    }
 
-      :deep(.el-icon) {
-        font-size: 12px;
-        margin: 0 6px 0 8px;
-      }
+    &.is-wait-dispatch {
+      color: var(--el-color-warning);
+    }
+
+    &.is-pending {
+      color: var(--el-color-danger);
     }
   }
 </style>

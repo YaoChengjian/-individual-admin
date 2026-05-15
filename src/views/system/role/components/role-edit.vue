@@ -14,16 +14,6 @@
       label-width="80px"
       @submit.prevent=""
     >
-      <el-form-item label="作用域" prop="scopeType">
-        <el-select
-          v-model="form.scopeType"
-          placeholder="请选择作用域"
-          class="y-fluid"
-        >
-          <el-option label="租户角色" value="tenant" />
-          <el-option label="平台角色" value="platform" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="角色名称" prop="roleName">
         <el-input
           clearable
@@ -39,18 +29,6 @@
           v-model="form.roleCode"
           placeholder="请输入角色标识"
         />
-      </el-form-item>
-      <el-form-item label="数据权限" prop="dataScope">
-        <el-select
-          v-model="form.dataScope"
-          placeholder="请选择数据权限"
-          class="y-fluid"
-        >
-          <el-option label="仅本人" value="self" />
-          <el-option label="本机构" value="organization" />
-          <el-option label="当前租户" value="tenant" />
-          <el-option label="全部数据" value="all" />
-        </el-select>
       </el-form-item>
       <el-form-item label="备注">
         <el-input
@@ -103,23 +81,13 @@
   /** 表单数据 */
   const [form, _resetFields, assignFields] = useFormData<Role>({
     roleId: void 0,
-    scopeType: 'tenant',
     roleName: '',
     roleCode: '',
-    dataScope: 'tenant',
     comments: ''
   });
 
   /** 表单验证规则 */
   const rules = reactive<FormRules>({
-    scopeType: [
-      {
-        required: true,
-        message: '请选择作用域',
-        type: 'string',
-        trigger: 'change'
-      }
-    ],
     roleName: [
       {
         required: true,
@@ -134,14 +102,6 @@
         message: '请输入角色标识',
         type: 'string',
         trigger: 'blur'
-      }
-    ],
-    dataScope: [
-      {
-        required: true,
-        message: '请选择数据权限',
-        type: 'string',
-        trigger: 'change'
       }
     ]
   });

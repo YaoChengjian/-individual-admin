@@ -28,6 +28,13 @@ export function getIconData() {
   Object.keys(eleIcons).forEach((key) => {
     iconData[`${eleIconPrefix}${key}`] = eleIcons[key];
   });
+  const fileSearchKey = `${eleIconPrefix}FileSearchOutlined`;
+  if (!iconData[fileSearchKey]) {
+    iconData[fileSearchKey] =
+      iconData[`${eleIconPrefix}SearchOutlined`] ||
+      iconData[`${eleIconPrefix}BookOutlined`] ||
+      iconData[`${eleIconPrefix}LinkOutlined`];
+  }
   return iconData;
 }
 

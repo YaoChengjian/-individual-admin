@@ -14,64 +14,28 @@
   <layout-tool :class="{ 'hidden-sm-and-down': tabBar && tabInHeader }">
     <header-notice />
   </layout-tool>
-  <!-- 租户切换 -->
-  <layout-tool v-if="showTenantSwitch" class="hidden-sm-and-down">
-    <header-tenant />
-  </layout-tool>
   <!-- 用户信息 -->
   <layout-tool>
     <header-user />
   </layout-tool>
-  <!-- 夜间模式 -->
-  <layout-tool ref="darkSwitchRef" class="y-dark-switch hidden-sm-and-down">
-    <el-switch
-      :active-action-icon="MoonOutlined"
-      :inactive-action-icon="SunOutlined"
-      :model-value="darkMode"
-      @update:modelValue="updateDarkMode"
-    />
-  </layout-tool>
-  <!-- 主题设置 -->
-  <layout-tool @click="openSetting" style="position: relative">
-    <el-icon>
-      <MoreOutlined />
-    </el-icon>
-    <div v-if="showTip" class="y-theme-setting-tip">
-      <IconOutline />
-      <div>
-        <div>试试切换布局或主题~</div>
-        <IconOutline :width="152" :height="34" />
-      </div>
-    </div>
-  </layout-tool>
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import { storeToRefs } from 'pinia';
   import {
     LayoutTool,
     requestFullscreen,
     exitFullscreen,
-    useModal,
     YMessage
   } from 'y-element-ultra';
   import {
     ExpandOutlined,
-    CompressOutlined,
-    MoreOutlined,
-    MoonOutlined,
-    SunOutlined
+    CompressOutlined
   } from '@/components/icons';
-  import { doWithTransition } from '@/utils/common';
   import { useThemeStore } from '@/store/modules/theme';
-  import { useUserStore } from '@/store/modules/user';
   import HeaderUser from './header-user.vue';
   import HeaderNotice from './header-notice.vue';
-  import HeaderTenant from './header-tenant.vue';
   import I18nIcon from './i18n-icon.vue';
-  import IconOutline from './covers/icon-outline.vue';
 
   const props = defineProps({
     /** 是否全屏状态 */
@@ -80,18 +44,8 @@
 
   const emit = defineEmits(['update:isFullscreen']);
 
-  const { openModal } = useModal();
-
   const themeStore = useThemeStore();
-  const userStore = useUserStore();
-  const { tabBar, tabInHeader, darkMode, weakMode } = storeToRefs(themeStore);
-
-  /** 是否展示租户切换 */
-  const showTenantSwitch = computed(
-    () => (userStore.info?.tenantList?.length ?? 0) > 1
-  );
-
-  const { t } = useI18n();
+  const { tabBar, tabInHeader } = storeToRefs(themeStore);
 
   /** 全屏切换 */
   const toggleFullscreen = () => {
@@ -108,37 +62,4 @@
       YMessage.error({ message: e.message, plain: true });
     }
   };
-
-  /** 打开主题设置抽屉 */
-  const openSetting = () => {
-    showTip.value = false;
-    openModal({
-      modalId: 'theme-setting-drawer',
-      type: 'drawer',
-      asyncComponent: () => import('./setting-drawer.vue'),
-      props: {
-        size: 268,
-        title: t('layout.setting.title'),
-        zIndex: 199999,
-        bodyStyle: { padding: 0, height: '100%' },
-        modalClass: 'y-setting-drawer'
-      },
-      keepAlive: true
-    });
-  };
-
-  /** 暗黑主题切换开关 */
-  const darkSwitchRef = ref<any>(null);
-
-  /** 切换暗黑模式 */
-  const updateDarkMode = (isDark?: any) => {
-    doWithTransition(
-      () => themeStore.setValue('darkMode', isDark),
-      darkSwitchRef.value?.$el?.querySelector?.('.el-switch__action'),
-      weakMode.value ? isDark : !isDark
-    );
-  };
-
-  /** 显示主题配置提示 */
-  const showTip = ref(true);
 </script>

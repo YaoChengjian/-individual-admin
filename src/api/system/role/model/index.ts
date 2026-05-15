@@ -6,16 +6,10 @@ import type { PageParam } from '@/api';
 export interface Role {
   /** 角色id */
   roleId?: number;
-  /** 角色作用域 */
-  scopeType?: string;
-  /** 所属租户id */
-  tenantId?: number;
   /** 角色标识 */
   roleCode?: string;
   /** 角色名称 */
   roleName?: string;
-  /** 数据权限范围 */
-  dataScope?: string;
   /** 是否系统内置角色 */
   isSystemRole?: number;
   /** 备注 */

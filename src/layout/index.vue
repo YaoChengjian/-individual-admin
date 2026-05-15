@@ -69,7 +69,7 @@
     <router-layout />
     <!-- logo -->
     <template #logo>
-      <img src="@/assets/logo.svg" style="width: 30px; height: 30px" />
+      <img src="@/assets/logo.png" class="app-logo" />
     </template>
     <template #logoTitle>
       <h1>{{ PROJECT_NAME }}</h1>

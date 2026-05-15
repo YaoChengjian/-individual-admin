@@ -49,7 +49,7 @@
           }"
         >
           <template #logo>
-            <img src="@/assets/logo.svg" />
+            <img src="@/assets/logo.png" />
           </template>
           <template #logoTitle>
             <h1>Y Admin</h1>

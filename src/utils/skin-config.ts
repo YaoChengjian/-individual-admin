@@ -179,8 +179,8 @@ export const PREDEFINED_LAYOUTS: PredefinedLayout[] = [
       colorfulIcon: false,
       layout: 'default',
       sidebarLayout: 'default',
-      headerStyle: 'primary',
-      sidebarStyle: 'light',
+      headerStyle: 'light',
+      sidebarStyle: 'dark',
       mixSidebarStyle: 'light',
       tabStyle: 'simple',
       fixedBody: true,
@@ -343,8 +343,8 @@ export const PREDEFINED_LAYOUTS: PredefinedLayout[] = [
       colorfulIcon: false,
       layout: 'default',
       sidebarLayout: 'default',
-      headerStyle: 'primary',
-      sidebarStyle: 'light',
+      headerStyle: 'light',
+      sidebarStyle: 'dark',
       mixSidebarStyle: 'light',
       tabStyle: 'tag',
       fixedBody: true,
@@ -954,11 +954,11 @@ export const SKIN_LAYOUTS: PredefinedLayout[] = PREDEFINED_LAYOUTS.map(
 export const PREDEFINED_SKINS: SkinConfig[] = [
   {
     name: 'simple',
-    color: '#2f54eb',
+    color: '#1452d9',
     cover: 'CoverSimple',
     themeClass: 'y-theme-simple',
     darkConfig: {
-      color: '#2f54eb',
+      color: '#1452d9',
       cover: 'CoverSimpleDark',
       themeClass: 'y-theme-simple-dark'
     },
@@ -1090,7 +1090,7 @@ export interface ThemeItem {
  * 预设主题色
  */
 export const PREDEFINE_THEMES: ThemeItem[] = [
-  { name: 'default', color: '#2f54eb' },
+  { name: 'default', color: '#1452d9' },
   { name: 'geekblue', value: '#1677ff' },
   { name: 'green', value: '#1ab394' },
   { name: 'purple', value: '#9333ea' },
