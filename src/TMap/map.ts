@@ -6,20 +6,50 @@ type ControlConfig = { position: string; className: string; numVisible?: boolean
 type ControlKey = 'zoom' | 'scale' | 'rotation';
 
 const hideTencentMapAttribution = (container: HTMLElement) => {
-	const selectors = [
-		'.logo-text',
-		'.tmap-logo',
-		'.tmap-copyright',
-		'.mapboxgl-ctrl-logo',
-		'.mapboxgl-ctrl-attrib',
-		'[class*="logo"]',
-		'[class*="copyright"]'
-	];
+	const isAttributionNode = (node: Element) => {
+		const text = (node.textContent || '').trim().toLowerCase();
+		const attrs = ['class', 'id', 'title', 'aria-label', 'href', 'src', 'style']
+			.map((key) => node.getAttribute(key) || '')
+			.join(' ')
+			.toLowerCase();
 
-	container.querySelectorAll<HTMLElement>(selectors.join(',')).forEach((node) => {
-		node.style.display = 'none';
-		node.style.visibility = 'hidden';
+		return (
+			text.includes('腾讯地图') ||
+			text.includes('tencent') ||
+			text.includes('©') ||
+			attrs.includes('logo') ||
+			attrs.includes('copyright') ||
+			attrs.includes('tencent') ||
+			attrs.includes('map.qq.com')
+		);
+	};
+
+	const removeNode = (node: Element) => {
+		const target = node.closest('a, div, span, img') || node;
+		target.parentElement?.removeChild(target);
+	};
+
+	container.querySelectorAll('*').forEach((node) => {
+		if (isAttributionNode(node)) {
+			removeNode(node);
+		}
 	});
+};
+
+const watchTencentMapAttribution = (container: HTMLElement) => {
+	hideTencentMapAttribution(container);
+	const observer = new MutationObserver(() => {
+		hideTencentMapAttribution(container);
+	});
+
+	observer.observe(container, {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		attributeFilter: ['class', 'id', 'title', 'aria-label', 'href', 'src', 'style'],
+	});
+
+	return observer;
 };
 
 const props = {
@@ -88,9 +118,10 @@ export default defineComponent({
 	props,
 	emits: ['map_inited'],
 	setup(props, context) {
-		const ele = ref<HTMLDivElement | null>(null);
-		const map = ref<TMap.Map | null>(null);
-		let mapInstance: TMap.Map;
+			const ele = ref<HTMLDivElement | null>(null);
+			const map = ref<TMap.Map | null>(null);
+			let mapInstance: TMap.Map;
+			let attributionObserver: MutationObserver | null = null;
 
 		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		onMounted(async () => {
@@ -100,17 +131,17 @@ export default defineComponent({
 			}
 			if (ele.value) {
 				// 初始化地图实例
-				mapInstance = new TMap.Map(ele.value, {
-					...props.options,
-					center: new TMap.LatLng(props.center.lat, props.center.lng),
-					zoom: props.zoom,
-					minZoom: props.minZoom,
-					maxZoom: props.maxZoom,
-				});
-				hideTencentMapAttribution(ele.value);
-				map.value = mapInstance;
-				nextTick(() => {
-					ele.value && hideTencentMapAttribution(ele.value);
+					mapInstance = new TMap.Map(ele.value, {
+						...props.options,
+						center: new TMap.LatLng(props.center.lat, props.center.lng),
+						zoom: props.zoom,
+						minZoom: props.minZoom,
+						maxZoom: props.maxZoom,
+					});
+					attributionObserver = watchTencentMapAttribution(ele.value);
+					map.value = mapInstance;
+					nextTick(() => {
+						ele.value && hideTencentMapAttribution(ele.value);
 					context.emit('map_inited', mapInstance);
 				});
 				// 绑定地图事件
@@ -157,10 +188,11 @@ export default defineComponent({
 			}
 		});
 		// 调用地图实例销毁方法
-		onUnmounted(() => {
-			if (mapInstance) {
-				mapInstance.destroy();
-			}
+			onUnmounted(() => {
+				attributionObserver?.disconnect();
+				if (mapInstance) {
+					mapInstance.destroy();
+				}
 		});
 		// 属性变化则调用方法改变地图效果
 		watch(
