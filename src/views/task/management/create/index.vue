@@ -50,7 +50,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
+  import {
+    computed,
+    nextTick,
+    onActivated,
+    onMounted,
+    reactive,
+    ref
+  } from 'vue';
   import { useRouter } from 'vue-router';
   import { YMessage } from 'y-element-ultra';
   import { addPatrolTask, getPatrolTaskCreateOptions } from '@/api/task';
@@ -97,6 +104,21 @@
     executorId: undefined
   });
 
+  const getEmptyForm = (): PatrolTaskCreateState => ({
+    taskTitle: '',
+    taskType: '',
+    priority: '',
+    description: '',
+    aiFocus: false,
+    areaIds: [],
+    pointIds: [],
+    startTime: '',
+    endTime: '',
+    durationHours: '',
+    repeatRule: '',
+    executorId: undefined
+  });
+
   const selectedExecutor = computed(() =>
     context.executors.find((item) => item.userId === form.executorId)
   );
@@ -115,6 +137,16 @@
       .finally(() => {
         loading.value = false;
       });
+  };
+
+  const resetForm = () => {
+    Object.assign(form, getEmptyForm());
+    nextTick(() => {
+      basicInfoRef.value?.clearValidate?.();
+      rangePointsRef.value?.clearValidate?.();
+      timeSettingRef.value?.clearValidate?.();
+      executorDeviceRef.value?.clearValidate?.();
+    });
   };
 
   const buildPayload = (draft = false): PatrolTaskCreateForm => ({
@@ -222,7 +254,12 @@
   };
 
   onMounted(() => {
+    resetForm();
     loadOptions();
+  });
+
+  onActivated(() => {
+    resetForm();
   });
 </script>
 

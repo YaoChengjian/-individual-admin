@@ -404,7 +404,11 @@
       });
     });
 
-  defineExpose({ validate });
+  const clearValidate = () => {
+    formRef.value?.clearValidate();
+  };
+
+  defineExpose({ clearValidate, validate });
 </script>
 
 <style lang="scss" scoped>
