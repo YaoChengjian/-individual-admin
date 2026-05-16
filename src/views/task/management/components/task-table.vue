@@ -176,14 +176,12 @@
           </section>
 
           <section class="task-report-section task-report-basic report-result">
-            <div class="report-table-title">三、处置结论</div>
+            <div class="report-table-title">处置结论</div>
             <div class="report-basic-table report-result-table">
               <div class="report-result-content">
-                任务已按流程完成闭环处置，当前状态为已完成。
-                <span class="report-result-danger">
-                  异常事件共 {{ reportTask.exceptionCount || 0 }} 件
-                </span>
-                ，已同步至任务档案并完成处置留痕。建议纳入本周巡查复盘，持续跟踪高频隐患点位与设备协同效率。
+                处置建议：下次巡查需重点关注{{
+                  reportTask.patrolLocation || '该区域'
+                }}高频隐患点位，复核异常事件整改情况，保持巡查影像、工单处置和现场反馈一致。
               </div>
             </div>
           </section>
@@ -457,28 +455,26 @@
     return `本次巡查任务围绕${task.patrolLocation || '指定区域'}开展，执行人${task.executorName || '-'}已完成现场巡查、异常核查、工单处置和结果归档。异常事件共${task.exceptionCount || 0}件，任务完成进度${task.progress || 100}%。`;
   });
 
-  const reportTimeline = computed(() => [
-    {
-      title: '任务创建',
-      desc: '任务信息完成登记，巡查范围、执行人与设备完成绑定。',
-      status: '已完成'
-    },
-    {
-      title: '任务执行',
-      desc: '巡查员按任务要求完成现场核查，采集过程数据并同步系统。',
-      status: '已完成'
-    },
-    {
-      title: '事件处置',
-      desc: '异常事件生成工单并完成处置确认，形成可追溯闭环记录。',
-      status: '已完成'
-    },
-    {
-      title: '报告归档',
-      desc: '系统汇总任务、工单、文书和状态数据，生成闭环报告。',
-      status: '已归档'
-    }
-  ]);
+  const reportTimeline = computed(() => {
+    const task = reportTask.value;
+    return [
+      {
+        title: '任务创建',
+        desc: `时间：${task?.createTime || '-'}`,
+        status: '已完成'
+      },
+      {
+        title: '任务执行',
+        desc: `时间：${task?.startTime || task?.planTime || '-'}`,
+        status: '已完成'
+      },
+      {
+        title: '事件处置',
+        desc: `时间：${task?.endTime || task?.planTime || '-'}`,
+        status: '已完成'
+      }
+    ];
+  });
 
   const normalizeImageSrc = (value?: string) => {
     const imageSrc = value?.trim();
