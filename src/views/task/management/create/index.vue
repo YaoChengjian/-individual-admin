@@ -171,6 +171,12 @@
     return Number.isNaN(time) ? 0 : time;
   };
 
+  const todayStart = () => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
+  };
+
   const validateForm = () => {
     if (!form.taskTitle) return '请输入任务标题';
     if (form.taskTitle.length > 50) return '任务标题不能超过50个字';
@@ -185,6 +191,7 @@
     const start = parseTaskTime(form.startTime);
     const end = parseTaskTime(form.endTime);
     if (!start || !end) return '任务时间格式不正确';
+    if (start < todayStart()) return '任务开始时间不能早于今天';
     if (end <= start) return '任务结束时间必须晚于开始时间';
     if (
       !Number.isInteger(Number(form.durationHours)) ||

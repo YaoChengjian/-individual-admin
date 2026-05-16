@@ -5,6 +5,23 @@ import { prefix } from './config';
 type ControlConfig = { position: string; className: string; numVisible?: boolean };
 type ControlKey = 'zoom' | 'scale' | 'rotation';
 
+const hideTencentMapAttribution = (container: HTMLElement) => {
+	const selectors = [
+		'.logo-text',
+		'.tmap-logo',
+		'.tmap-copyright',
+		'.mapboxgl-ctrl-logo',
+		'.mapboxgl-ctrl-attrib',
+		'[class*="logo"]',
+		'[class*="copyright"]'
+	];
+
+	container.querySelectorAll<HTMLElement>(selectors.join(',')).forEach((node) => {
+		node.style.display = 'none';
+		node.style.visibility = 'hidden';
+	});
+};
+
 const props = {
 	// 腾讯位置服务开发Key
 	apiKey: {
@@ -90,8 +107,10 @@ export default defineComponent({
 					minZoom: props.minZoom,
 					maxZoom: props.maxZoom,
 				});
+				hideTencentMapAttribution(ele.value);
 				map.value = mapInstance;
 				nextTick(() => {
+					ele.value && hideTencentMapAttribution(ele.value);
 					context.emit('map_inited', mapInstance);
 				});
 				// 绑定地图事件

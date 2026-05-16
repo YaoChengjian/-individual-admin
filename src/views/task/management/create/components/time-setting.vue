@@ -85,6 +85,28 @@
 
   const startTime = () => toTime(model.value.startTime);
   const endTime = () => toTime(model.value.endTime);
+  const todayStart = () => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
+  };
+
+  const validateStartTime = (
+    _rule: unknown,
+    value: string,
+    callback: (error?: Error) => void
+  ) => {
+    const start = toTime(value);
+    if (!value) {
+      callback(new Error('请选择任务开始时间'));
+      return;
+    }
+    if (start < todayStart()) {
+      callback(new Error('任务开始时间不能早于今天'));
+      return;
+    }
+    callback();
+  };
 
   const validateEndTime = (
     _rule: unknown,
@@ -99,6 +121,10 @@
     }
     if (start && end <= start) {
       callback(new Error('任务结束时间必须晚于开始时间'));
+      return;
+    }
+    if (end < todayStart()) {
+      callback(new Error('任务结束时间不能早于今天'));
       return;
     }
     callback();
@@ -125,7 +151,7 @@
 
   const rules = reactive<FormRules>({
     startTime: [
-      { required: true, message: '请选择任务开始时间', trigger: 'change' }
+      { required: true, validator: validateStartTime, trigger: 'change' }
     ],
     endTime: [
       { required: true, validator: validateEndTime, trigger: 'change' }
@@ -139,11 +165,13 @@
   });
 
   const disabledStartDate = (date: Date) => {
+    if (date.getTime() < todayStart()) return true;
     const end = endTime();
     return !!end && date.getTime() > end;
   };
 
   const disabledEndDate = (date: Date) => {
+    if (date.getTime() < todayStart()) return true;
     const start = startTime();
     return !!start && date.getTime() < start;
   };
@@ -151,6 +179,15 @@
   const handleStartChange = () => {
     const start = startTime();
     const end = endTime();
+    if (start && start < todayStart()) {
+      model.value.startTime = '';
+      YMessage.warning({
+        message: '任务开始时间不能早于今天',
+        plain: true
+      });
+      formRef.value?.validateField?.('startTime');
+      return;
+    }
     if (start && end && start >= end) {
       model.value.endTime = '';
       YMessage.warning({
