@@ -99,7 +99,7 @@
 
       <div class="point-panel pb-3">
         <div class="point-title">
-          <strong>小区/楼栋/重点点位清单</strong>
+          <strong>小区/楼栋/点位清单</strong>
           <span>共{{ selectedPoints.length }}个点位</span>
         </div>
         <el-scrollbar class="point-scrollbar pb-1">

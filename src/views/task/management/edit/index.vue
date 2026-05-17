@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div class="create-footer">
+    <div class="create-footer" :class="{ 'is-visible': footerVisible }">
       <div class="create-footer-actions">
         <el-button size="large" @click="cancel">取消</el-button>
         <el-button
@@ -47,8 +47,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
+  import { computed, onDeactivated, reactive, ref, watch } from 'vue';
+  import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
   import { YMessage } from 'y-element-ultra';
   import { getPatrolTaskDetail, updatePatrolTask } from '@/api/task';
   import { useDictData } from '@/utils/use-dict-data';
@@ -68,8 +68,10 @@
   const router = useRouter();
   const [priorityDict] = useDictData(['patrol_task_priority']);
 
-  const loading = ref(false);
+  const loading = ref(true);
   const submitting = ref(false);
+  const footerVisible = ref(false);
+  let footerTimer = 0;
   const basicInfoRef = ref<InstanceType<typeof BasicInfo> | null>(null);
   const rangePointsRef = ref<InstanceType<typeof RangePoints> | null>(null);
   const timeSettingRef = ref<InstanceType<typeof TimeSetting> | null>(null);
@@ -98,34 +100,95 @@
     executorId: undefined
   });
 
+  const getEmptyForm = (): PatrolTaskCreateState => ({
+    taskTitle: '',
+    taskType: '',
+    priority: '',
+    description: '',
+    aiFocus: false,
+    areaIds: [],
+    pointIds: [],
+    startTime: '',
+    endTime: '',
+    durationHours: '',
+    repeatRule: '',
+    executorId: undefined
+  });
+
+  const normalizeIds = (value: unknown) => {
+    if (Array.isArray(value)) {
+      return value.map(Number).filter((id) => Number.isFinite(id) && id > 0);
+    }
+    if (typeof value === 'string' && value.trim()) {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed)
+          ? parsed.map(Number).filter((id) => Number.isFinite(id) && id > 0)
+          : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const resetForm = () => {
+    Object.assign(form, getEmptyForm());
+    context.areas = [];
+    context.points = [];
+    context.executors = [];
+  };
+
   const selectedExecutor = computed(() =>
     context.executors.find((item) => item.userId === form.executorId)
   );
 
   const taskId = computed(() => Number(route.query.taskId || 0));
 
+  const hideFooter = () => {
+    if (footerTimer) {
+      window.cancelAnimationFrame(footerTimer);
+      footerTimer = 0;
+    }
+    footerVisible.value = false;
+  };
+
+  const showFooter = () => {
+    hideFooter();
+    footerTimer = window.requestAnimationFrame(() => {
+      footerTimer = 0;
+      footerVisible.value = route.path === '/task/management/edit' && !loading.value;
+    });
+  };
+
   const fillTask = (task: any) => {
-    form.taskTitle = task.taskTitle || '';
-    form.taskType = task.taskType || '';
+    form.taskTitle = task.taskTitle || task.title || '';
+    form.taskType = task.taskType || task.type || '';
     form.priority = task.priority || '';
     form.description = task.description || '';
     form.aiFocus = !!task.aiFocus;
-    form.areaIds = task.areaIds || [];
-    form.pointIds = task.pointIds || [];
+    form.areaIds = normalizeIds(task.areaIds);
+    form.pointIds = normalizeIds(task.pointIds);
     form.startTime = task.startTime || task.planTime || '';
     form.endTime = task.endTime || '';
     form.durationHours = task.durationHours || '';
     form.repeatRule = task.repeatRule || '';
-    form.executorId = task.executorId;
+    form.executorId = Number(task.executorId) || undefined;
   };
 
   const loadDetail = () => {
+    if (route.path !== '/task/management/edit') {
+      hideFooter();
+      return;
+    }
+    hideFooter();
     if (!taskId.value) {
       YMessage.warning({ message: '缺少巡查任务参数', plain: true });
       router.push('/task/management');
       return;
     }
     loading.value = true;
+    resetForm();
     getPatrolTaskDetail({ taskId: taskId.value })
       .then((data) => {
         context.areas = data.areas || [];
@@ -139,6 +202,7 @@
       })
       .finally(() => {
         loading.value = false;
+        showFooter();
       });
   };
 
@@ -250,8 +314,24 @@
     saveTask();
   };
 
-  onMounted(() => {
-    loadDetail();
+  watch(
+    () => [route.path, route.query.taskId],
+    () => {
+      if (route.path === '/task/management/edit') {
+        loadDetail();
+      } else {
+        hideFooter();
+      }
+    },
+    { immediate: true }
+  );
+
+  onBeforeRouteLeave(() => {
+    hideFooter();
+  });
+
+  onDeactivated(() => {
+    hideFooter();
   });
 </script>
 
@@ -305,6 +385,14 @@
     border-top: 1px solid #edf1f7;
     background: rgb(255 255 255 / 94%);
     backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+
+    &.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     .el-button {
       min-width: 128px;

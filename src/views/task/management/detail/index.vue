@@ -26,15 +26,15 @@
       </div>
     </div>
 
-    <div class="detail-footer">
+    <div class="detail-footer" :class="{ 'is-visible': footerVisible }">
       <el-button size="large" @click="back">返回列表</el-button>
     </div>
   </y-page>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
+  import { onDeactivated, reactive, ref, watch } from 'vue';
+  import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
   import { YMessage } from 'y-element-ultra';
   import { getPatrolTaskDetail } from '@/api/task';
   import { useDictData } from '@/utils/use-dict-data';
@@ -53,7 +53,9 @@
   const router = useRouter();
   const [priorityDict] = useDictData(['patrol_task_priority']);
 
-  const loading = ref(false);
+  const loading = ref(true);
+  const footerVisible = ref(false);
+  let footerTimer = 0;
   const context = reactive<TaskCreateContext>({
     areas: [],
     points: [],
@@ -75,9 +77,31 @@
     executorId: undefined
   });
 
+  const getEmptyForm = (): PatrolTaskCreateState => ({
+    taskTitle: '',
+    taskType: '',
+    priority: '',
+    description: '',
+    aiFocus: false,
+    areaIds: [],
+    pointIds: [],
+    startTime: '',
+    endTime: '',
+    durationHours: '',
+    repeatRule: '',
+    executorId: undefined
+  });
+
+  const resetForm = () => {
+    Object.assign(form, getEmptyForm());
+    context.areas = [];
+    context.points = [];
+    context.executors = [];
+  };
+
   const fillTask = (task: any) => {
-    form.taskTitle = task.taskTitle || '';
-    form.taskType = task.taskType || '';
+    form.taskTitle = task.taskTitle || task.title || '';
+    form.taskType = task.taskType || task.type || '';
     form.priority = task.priority || '';
     form.description = task.description || '暂无任务说明';
     form.aiFocus = !!task.aiFocus;
@@ -90,7 +114,28 @@
     form.executorId = task.executorId;
   };
 
+  const hideFooter = () => {
+    if (footerTimer) {
+      window.cancelAnimationFrame(footerTimer);
+      footerTimer = 0;
+    }
+    footerVisible.value = false;
+  };
+
+  const showFooter = () => {
+    hideFooter();
+    footerTimer = window.requestAnimationFrame(() => {
+      footerTimer = 0;
+      footerVisible.value = route.path === '/task/management/detail' && !loading.value;
+    });
+  };
+
   const loadDetail = () => {
+    if (route.path !== '/task/management/detail') {
+      hideFooter();
+      return;
+    }
+    hideFooter();
     const taskId = Number(route.query.taskId);
     const taskCode = String(route.query.taskCode || '');
     if (!taskId && !taskCode) {
@@ -100,6 +145,7 @@
     }
 
     loading.value = true;
+    resetForm();
     getPatrolTaskDetail({
       taskId: taskId || undefined,
       taskCode: taskCode || undefined
@@ -116,6 +162,7 @@
       })
       .finally(() => {
         loading.value = false;
+        showFooter();
       });
   };
 
@@ -123,8 +170,24 @@
     router.push('/task/management');
   };
 
-  onMounted(() => {
-    loadDetail();
+  watch(
+    () => [route.path, route.query.taskId, route.query.taskCode],
+    () => {
+      if (route.path === '/task/management/detail') {
+        loadDetail();
+      } else {
+        hideFooter();
+      }
+    },
+    { immediate: true }
+  );
+
+  onBeforeRouteLeave(() => {
+    hideFooter();
+  });
+
+  onDeactivated(() => {
+    hideFooter();
   });
 </script>
 
@@ -178,6 +241,14 @@
     border-top: 1px solid #edf1f7;
     background: rgb(255 255 255 / 94%);
     backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+
+    &.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     .el-button {
       min-width: 128px;
